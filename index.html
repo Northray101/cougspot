@@ -8,6 +8,42 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* ── Comments ── */
+.comments-section { padding: 0 0 4px 0; }
+.comments-list { display: flex; flex-direction: column; gap: 0; }
+.comment {
+  padding: 12px 0 8px 0;
+  border-top: 1px solid var(--border);
+  animation: fadeUp 0.25s ease both;
+}
+.comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.comment-body { font-size: 13px; color: var(--text); font-weight: 300; line-height: 1.6; padding-left: 34px; }
+.comment-actions { display: flex; gap: 8px; padding-left: 34px; margin-top: 6px; }
+.replies { padding-left: 28px; border-left: 1px solid var(--border); margin: 8px 0 4px 12px; }
+.reply { padding: 8px 0 4px 0; }
+.comment-empty { font-size: 12px; color: var(--faint); padding: 12px 0; font-weight: 300; }
+.comment-box { padding: 12px 0 4px 0; border-top: 1px solid var(--border); }
+.comment-textarea {
+  width: 100%; background: var(--raised); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300;
+  resize: none; outline: none; transition: border-color 0.15s; line-height: 1.5;
+}
+.comment-textarea:focus { border-color: var(--blue); }
+.comment-textarea::placeholder { color: var(--faint); }
+.comment-box-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+
+/* ── Anon toggle ── */
+.anon-toggle { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+
+/* ── Clock collapsible ── */
+.clock-collapse-btn {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font-size: 12px; padding: 2px 4px; transition: color 0.15s; line-height: 1;
+}
+.clock-collapse-btn:hover { color: var(--text); }
+</style>
 </head>
 <body>
 
@@ -44,10 +80,10 @@
       <span class="accent-b">Stay in the loop.</span>
     </h1>
 
-    <p class="landing-sub">Period timers, sports schedules, announcements, and posts — everything Norco students actually need. Not a classroom app.</p>
+    <p class="landing-sub">Period timers, sports schedules, announcements, and a student feed — everything Norco students actually need.</p>
 
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="openModal('signup')">Create Account</button>
+      <button class="btn btn-primary" onclick="startSignup()">Create Account</button>
       <button class="btn btn-ghost"   onclick="openModal('login')">Sign In</button>
     </div>
 
@@ -59,7 +95,7 @@
     </div>
   </div>
 
-  <!-- HOME (authenticated) -->
+  <!-- HOME -->
   <div id="screen-home" class="screen">
     <nav class="nav">
       <div class="nav-left">
@@ -84,7 +120,7 @@
         </div>
       </div>
       <div class="nav-right">
-        <button class="nav-icon-btn" title="Admin" onclick="openBouncer()">
+        <button class="nav-icon-btn" title="Admin" onclick="openAdminGate()">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </button>
         <div class="avatar" id="nav-avatar">?</div>
@@ -105,11 +141,6 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
           Sports
         </a>
-        <div class="sidebar-label">Tools</div>
-        <button class="sidebar-item" onclick="setNav(this)">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Period Clock
-        </button>
         <div style="flex:1"></div>
         <button class="sidebar-item" onclick="signOut()" style="color:#fca5a5">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -121,10 +152,11 @@
       <main class="feed">
         <div class="feed-header">
           <div class="feed-title">Feed</div>
-          <div style="display:flex;gap:8px;">
-            <button class="tag-btn" style="background:rgba(26,58,219,0.1);border-color:#1a3adb;color:#93aeff">All</button>
-            <button class="tag-btn">Sports</button>
-            <button class="tag-btn">Events</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="tag-btn feed-filter-btn" data-filter="all"     onclick="loadPosts('all')"     style="background:rgba(26,58,219,0.1);border-color:#1a3adb;color:#93aeff">All</button>
+            <button class="tag-btn feed-filter-btn" data-filter="general" onclick="loadPosts('general')" >General</button>
+            <button class="tag-btn feed-filter-btn" data-filter="sports"  onclick="loadPosts('sports')"  >Sports</button>
+            <button class="tag-btn feed-filter-btn" data-filter="events"  onclick="loadPosts('events')"  >Events</button>
           </div>
         </div>
 
@@ -136,11 +168,17 @@
           </div>
           <div class="compose-actions">
             <div class="compose-tags">
-              <button class="tag-btn" onclick="setPostTag('general')">General</button>
-              <button class="tag-btn" onclick="setPostTag('sports')">Sports</button>
-              <button class="tag-btn" onclick="setPostTag('events')">Events</button>
+              <button class="tag-btn" onclick="setPostTag('general', this)">General</button>
+              <button class="tag-btn" onclick="setPostTag('sports',  this)">Sports</button>
+              <button class="tag-btn" onclick="setPostTag('events',  this)">Events</button>
             </div>
-            <button class="btn btn-primary" style="padding:8px 18px;font-size:13px" onclick="submitPost()">Post</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="tag-btn anon-toggle" id="anon-post-btn" onclick="toggleAnonPost()" title="Post anonymously">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="18" y1="11" x2="18" y2="17"/><line x1="21" y1="14" x2="15" y2="14"/></svg>
+                Anon
+              </button>
+              <button class="btn btn-primary" style="padding:8px 18px;font-size:13px" onclick="submitPost()">Post</button>
+            </div>
           </div>
         </div>
 
@@ -148,7 +186,7 @@
         <div id="posts-container">
           <div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <p>No posts yet. Be the first to post something.</p>
+            <p>No posts yet.</p>
           </div>
         </div>
       </main>
@@ -156,38 +194,40 @@
       <!-- RIGHT PANEL -->
       <aside class="right-panel">
 
-        <!-- PERIOD CLOCK -->
+        <!-- PERIOD CLOCK — collapsible -->
         <div class="panel-card">
           <div class="panel-card-head">
             <span>Period Clock</span>
-            <span id="clock-live" style="color:var(--electric);font-size:10px">&#9679; LIVE</span>
-          </div>
-          <div class="period-display">
-            <div class="period-name"  id="pd-name">Loading...</div>
-            <div class="period-time"  id="pd-time">--:--</div>
-            <div class="period-label" id="pd-label">Calculating...</div>
-            <div class="period-bar-wrap">
-              <div class="period-bar-fill" id="pd-bar" style="width:0%"></div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="color:var(--electric);font-size:10px">&#9679; LIVE</span>
+              <button class="clock-collapse-btn" id="clock-toggle-btn" onclick="toggleClock()" title="Collapse">▴</button>
             </div>
           </div>
-          <div class="periods-list" id="periods-list"></div>
+          <div id="clock-body">
+            <div class="period-display">
+              <div class="period-name"  id="pd-name">Loading...</div>
+              <div class="period-time"  id="pd-time">--:--</div>
+              <div class="period-label" id="pd-label">Calculating...</div>
+              <div class="period-bar-wrap">
+                <div class="period-bar-fill" id="pd-bar" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="periods-list" id="periods-list"></div>
+          </div>
         </div>
 
         <!-- ANNOUNCEMENTS -->
         <div class="panel-card">
-          <div class="panel-card-head">
-            <span>Announcements</span>
-          </div>
+          <div class="panel-card-head"><span>Announcements</span></div>
           <div id="announcement-body">
             <p class="announcement-empty">No announcements right now.</p>
           </div>
-
           <!-- Admin tools — hidden until PIN unlocked -->
           <div id="announce-form" class="announce-form" style="display:none">
             <textarea id="announce-input" class="announce-textarea" placeholder="Write an announcement..." rows="3"></textarea>
             <div class="announce-actions">
               <button class="btn btn-primary" style="font-size:12px;padding:8px 14px;flex:1" onclick="sendAnnouncement()">Send</button>
-              <button class="btn btn-danger"  style="font-size:12px;padding:8px 14px" onclick="dismissAnnouncement()">Dismiss</button>
+              <button class="btn btn-danger"  style="font-size:12px;padding:8px 14px"        onclick="dismissAnnouncement()">Dismiss</button>
             </div>
           </div>
         </div>
@@ -199,6 +239,38 @@
 </div><!-- #app -->
 
 <!-- ════ MODALS ════ -->
+
+<!-- PIN GATE (site-wide + admin) — cannot be dismissed by clicking outside -->
+<div id="modal-pin-gate" class="modal-overlay">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div class="bouncer-wrap">
+      <div class="bouncer-icon">&#x1F512;</div>
+      <h2 style="font-size:18px" id="pin-gate-title">Enter Site PIN</h2>
+      <p class="sub" style="margin-bottom:0" id="pin-gate-sub">This site is invite-only. Enter the PIN to continue.</p>
+    </div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pg-dot-0"></div>
+      <div class="pin-dot" id="pg-dot-1"></div>
+      <div class="pin-dot" id="pg-dot-2"></div>
+      <div class="pin-dot" id="pg-dot-3"></div>
+    </div>
+    <div class="field-error" id="pin-gate-error" style="margin-bottom:12px">Incorrect PIN.</div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pgKey('1')">1</button>
+      <button class="pin-key" onclick="pgKey('2')">2</button>
+      <button class="pin-key" onclick="pgKey('3')">3</button>
+      <button class="pin-key" onclick="pgKey('4')">4</button>
+      <button class="pin-key" onclick="pgKey('5')">5</button>
+      <button class="pin-key" onclick="pgKey('6')">6</button>
+      <button class="pin-key" onclick="pgKey('7')">7</button>
+      <button class="pin-key" onclick="pgKey('8')">8</button>
+      <button class="pin-key" onclick="pgKey('9')">9</button>
+      <button class="pin-key" onclick="pgKey('del')" style="font-size:13px;color:var(--muted)">&#x232B;</button>
+      <button class="pin-key" onclick="pgKey('0')">0</button>
+      <button class="pin-key" onclick="closeModal('pin-gate')" style="font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="modal-login" class="modal-overlay">
@@ -224,7 +296,7 @@
     <div class="modal-footer">
       <button class="btn btn-primary" style="justify-content:center;width:100%" onclick="doLogin()" id="login-btn">Sign in</button>
     </div>
-    <div class="modal-switch">No account? <a onclick="switchModal('login','signup')">Create one</a></div>
+    <div class="modal-switch">No account? <a onclick="closeModal('login');startSignup()">Create one</a></div>
   </div>
 </div>
 
@@ -253,38 +325,6 @@
       <button class="btn btn-primary" style="justify-content:center;width:100%" onclick="doSignup()" id="signup-btn">Create account</button>
     </div>
     <div class="modal-switch">Already have an account? <a onclick="switchModal('signup','login')">Sign in</a></div>
-  </div>
-</div>
-
-<!-- BOUNCER (Admin PIN) -->
-<div id="modal-bouncer" class="modal-overlay">
-  <div class="modal" style="max-width:360px;text-align:center">
-    <div class="bouncer-wrap">
-      <div class="bouncer-icon">&#x1F510;</div>
-      <h2 style="font-size:18px">Admin Access</h2>
-      <p class="sub" style="margin-bottom:0">Enter your PIN to continue.</p>
-    </div>
-    <div class="pin-dots">
-      <div class="pin-dot" id="pd0"></div>
-      <div class="pin-dot" id="pd1"></div>
-      <div class="pin-dot" id="pd2"></div>
-      <div class="pin-dot" id="pd3"></div>
-    </div>
-    <div class="field-error" id="bouncer-error" style="margin-bottom:12px">Incorrect PIN.</div>
-    <div class="pin-keypad">
-      <button class="pin-key" onclick="pinKey('1')">1</button>
-      <button class="pin-key" onclick="pinKey('2')">2</button>
-      <button class="pin-key" onclick="pinKey('3')">3</button>
-      <button class="pin-key" onclick="pinKey('4')">4</button>
-      <button class="pin-key" onclick="pinKey('5')">5</button>
-      <button class="pin-key" onclick="pinKey('6')">6</button>
-      <button class="pin-key" onclick="pinKey('7')">7</button>
-      <button class="pin-key" onclick="pinKey('8')">8</button>
-      <button class="pin-key" onclick="pinKey('9')">9</button>
-      <button class="pin-key" onclick="pinKey('del')" style="font-size:13px;color:var(--muted)">&#x232B;</button>
-      <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key" onclick="closeModal('bouncer')" style="font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif">Cancel</button>
-    </div>
   </div>
 </div>
 
