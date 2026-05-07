@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CougSpot — Norco High</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div id="app">
+
+  <!-- LOADING -->
+  <div id="screen-loading" class="screen active">
+    <div class="loading-logo">Coug<span class="c2">Spot</span></div>
+    <div class="spinner" style="color:var(--violet)"></div>
+  </div>
+
+  <!-- LANDING -->
+  <div id="screen-landing" class="screen">
+    <div class="landing-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="17" r="7" fill="#1a3adb"/>
+          <circle cx="22" cy="17" r="3" fill="#7b5ef8"/>
+          <path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#1a3adb" opacity=".8"/>
+          <circle cx="29" cy="12" r="3" fill="#7b5ef8" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="wordmark"><span class="c1">Coug</span><span class="c2">Spot</span></div>
+    </div>
+
+    <p class="landing-tagline">Norco High School &middot; Student Hub</p>
+
+    <h1 class="landing-hero">
+      Your school.<br/>
+      Your <span class="accent">space.</span><br/>
+      <span class="accent-b">Stay in the loop.</span>
+    </h1>
+
+    <p class="landing-sub">Period timers, sports schedules, announcements, and posts — everything Norco students actually need. Not a classroom app.</p>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="openModal('signup')">Create Account</button>
+      <button class="btn btn-ghost"   onclick="openModal('login')">Sign In</button>
+    </div>
+
+    <div class="feature-strip">
+      <div class="feat-chip"><span class="dot blue"></span>Live period clock</div>
+      <div class="feat-chip"><span class="dot"></span>Student feed</div>
+      <div class="feat-chip"><span class="dot electric"></span>Sports schedules</div>
+      <div class="feat-chip"><span class="dot blue"></span>Announcements</div>
+    </div>
+  </div>
+
+  <!-- HOME (authenticated) -->
+  <div id="screen-home" class="screen">
+    <nav class="nav">
+      <div class="nav-left">
+        <div class="logo-icon" style="width:34px;height:34px;border-radius:9px;">
+          <svg width="18" height="18" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="17" r="7" fill="#1a3adb"/>
+            <circle cx="22" cy="17" r="3" fill="#7b5ef8"/>
+            <path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#1a3adb" opacity=".8"/>
+            <circle cx="29" cy="12" r="3" fill="#7b5ef8" opacity=".9"/>
+          </svg>
+        </div>
+        <span class="nav-wordmark"><span style="color:var(--text)">Coug</span><span style="color:var(--violet)">Spot</span></span>
+        <div class="nav-links">
+          <a class="nav-link active" href="index.html">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Feed
+          </a>
+          <a class="nav-link" href="sports.html">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+            Sports
+          </a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="nav-icon-btn" title="Admin" onclick="openBouncer()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </button>
+        <div class="avatar" id="nav-avatar">?</div>
+        <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="signOut()">Sign out</button>
+      </div>
+    </nav>
+
+    <div class="home-body">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-label">Navigate</div>
+        <button class="sidebar-item active" onclick="setNav(this)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Feed
+        </button>
+        <a class="sidebar-item" href="sports.html">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+          Sports
+        </a>
+        <div class="sidebar-label">Tools</div>
+        <button class="sidebar-item" onclick="setNav(this)">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Period Clock
+        </button>
+        <div style="flex:1"></div>
+        <button class="sidebar-item" onclick="signOut()" style="color:#fca5a5">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </aside>
+
+      <!-- FEED -->
+      <main class="feed">
+        <div class="feed-header">
+          <div class="feed-title">Feed</div>
+          <div style="display:flex;gap:8px;">
+            <button class="tag-btn" style="background:rgba(26,58,219,0.1);border-color:#1a3adb;color:#93aeff">All</button>
+            <button class="tag-btn">Sports</button>
+            <button class="tag-btn">Events</button>
+          </div>
+        </div>
+
+        <!-- COMPOSE -->
+        <div class="compose-box">
+          <div class="compose-row">
+            <div class="avatar" id="compose-avatar" style="flex-shrink:0;margin-top:2px">?</div>
+            <textarea class="compose-input" id="compose-input" placeholder="What's going on at Norco?" rows="2"></textarea>
+          </div>
+          <div class="compose-actions">
+            <div class="compose-tags">
+              <button class="tag-btn" onclick="setPostTag('general')">General</button>
+              <button class="tag-btn" onclick="setPostTag('sports')">Sports</button>
+              <button class="tag-btn" onclick="setPostTag('events')">Events</button>
+            </div>
+            <button class="btn btn-primary" style="padding:8px 18px;font-size:13px" onclick="submitPost()">Post</button>
+          </div>
+        </div>
+
+        <!-- POSTS -->
+        <div id="posts-container">
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p>No posts yet. Be the first to post something.</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT PANEL -->
+      <aside class="right-panel">
+
+        <!-- PERIOD CLOCK -->
+        <div class="panel-card">
+          <div class="panel-card-head">
+            <span>Period Clock</span>
+            <span id="clock-live" style="color:var(--electric);font-size:10px">&#9679; LIVE</span>
+          </div>
+          <div class="period-display">
+            <div class="period-name"  id="pd-name">Loading...</div>
+            <div class="period-time"  id="pd-time">--:--</div>
+            <div class="period-label" id="pd-label">Calculating...</div>
+            <div class="period-bar-wrap">
+              <div class="period-bar-fill" id="pd-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="periods-list" id="periods-list"></div>
+        </div>
+
+        <!-- ANNOUNCEMENTS -->
+        <div class="panel-card">
+          <div class="panel-card-head">
+            <span>Announcements</span>
+          </div>
+          <div id="announcement-body">
+            <p class="announcement-empty">No announcements right now.</p>
+          </div>
+
+          <!-- Admin tools — hidden until PIN unlocked -->
+          <div id="announce-form" class="announce-form" style="display:none">
+            <textarea id="announce-input" class="announce-textarea" placeholder="Write an announcement..." rows="3"></textarea>
+            <div class="announce-actions">
+              <button class="btn btn-primary" style="font-size:12px;padding:8px 14px;flex:1" onclick="sendAnnouncement()">Send</button>
+              <button class="btn btn-danger"  style="font-size:12px;padding:8px 14px" onclick="dismissAnnouncement()">Dismiss</button>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<!-- ════ MODALS ════ -->
+
+<!-- LOGIN -->
+<div id="modal-login" class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">&#x2715;</button>
+    <div class="modal-logo">
+      <div class="logo-icon" style="width:36px;height:36px;border-radius:9px;">
+        <svg width="18" height="18" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="17" r="7" fill="#1a3adb"/><circle cx="22" cy="17" r="3" fill="#7b5ef8"/><path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#1a3adb" opacity=".8"/><circle cx="29" cy="12" r="3" fill="#7b5ef8" opacity=".9"/></svg>
+      </div>
+      <span class="wordmark" style="font-size:20px"><span class="c1">Coug</span><span class="c2">Spot</span></span>
+    </div>
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to your CougSpot account.</p>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="login-username" placeholder="your_username" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password"/>
+    </div>
+    <div class="field-error" id="login-error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" style="justify-content:center;width:100%" onclick="doLogin()" id="login-btn">Sign in</button>
+    </div>
+    <div class="modal-switch">No account? <a onclick="switchModal('login','signup')">Create one</a></div>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div id="modal-signup" class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('signup')">&#x2715;</button>
+    <div class="modal-logo">
+      <div class="logo-icon" style="width:36px;height:36px;border-radius:9px;">
+        <svg width="18" height="18" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="17" r="7" fill="#1a3adb"/><circle cx="22" cy="17" r="3" fill="#7b5ef8"/><path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#1a3adb" opacity=".8"/><circle cx="29" cy="12" r="3" fill="#7b5ef8" opacity=".9"/></svg>
+      </div>
+      <span class="wordmark" style="font-size:20px"><span class="c1">Coug</span><span class="c2">Spot</span></span>
+    </div>
+    <h2>Create your account</h2>
+    <p class="sub">For Norco High students. Not affiliated with the school.</p>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="signup-username" placeholder="coug_fan" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="signup-password" placeholder="Min 8 characters" autocomplete="new-password"/>
+    </div>
+    <div class="field-error" id="signup-error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" style="justify-content:center;width:100%" onclick="doSignup()" id="signup-btn">Create account</button>
+    </div>
+    <div class="modal-switch">Already have an account? <a onclick="switchModal('signup','login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- BOUNCER (Admin PIN) -->
+<div id="modal-bouncer" class="modal-overlay">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div class="bouncer-wrap">
+      <div class="bouncer-icon">&#x1F510;</div>
+      <h2 style="font-size:18px">Admin Access</h2>
+      <p class="sub" style="margin-bottom:0">Enter your PIN to continue.</p>
+    </div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="field-error" id="bouncer-error" style="margin-bottom:12px">Incorrect PIN.</div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinKey('del')" style="font-size:13px;color:var(--muted)">&#x232B;</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="closeModal('bouncer')" style="font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
