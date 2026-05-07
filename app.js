@@ -113,7 +113,7 @@ async function doLogin() {
   btn.disabled  = true;
 
   // Supabase uses email under the hood; we store username as the local part
-  const fakeEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '') + '@cougspot.local';
+  const fakeEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '') + '@cougspot.app';
   const { data, error } = await sb.auth.signInWithPassword({ email: fakeEmail, password });
 
   btn.disabled = false;
@@ -144,7 +144,7 @@ async function doSignup() {
   btn.innerHTML = '<span class="spinner"></span>';
   btn.disabled  = true;
 
-  const fakeEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '') + '@cougspot.local';
+  const fakeEmail = username.toLowerCase().replace(/[^a-z0-9]/g, '') + '@cougspot.app';
   const { data, error } = await sb.auth.signUp({
     email:    fakeEmail,
     password: password,
