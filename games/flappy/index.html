@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flappy Bird</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d0d; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  canvas { border-radius: 8px; display: block; cursor: pointer; }
+</style>
+</head>
+<body>
+<canvas id="c" width="320" height="480"></canvas>
+<script>
+const C=document.getElementById('c'),ctx=C.getContext('2d');
+const W=320,H=480,GAP=120,PIPE_W=50,SPEED=2.5,GRAVITY=0.35,JUMP=-7;
+let bird,pipes,score,best,state,frame;
+// state: 'start' | 'play' | 'dead'
+
+function reset(){
+  bird={x:80,y:H/2,vy:0,r:14};
+  pipes=[];score=0;frame=0;state='start';
+  if(!best)best=0;
+}
+
+function addPipe(){
+  const gap_y=60+Math.random()*(H-180);
+  pipes.push({x:W,top:gap_y,bot:gap_y+GAP,passed:false});
+}
+
+function flap(){
+  if(state==='start'){state='play';bird.vy=JUMP;return;}
+  if(state==='play'){bird.vy=JUMP;return;}
+  if(state==='dead'){reset();state='play';bird.vy=JUMP;}
+}
+
+function tick(){
+  frame++;
+  if(state!=='play')return;
+  bird.vy+=GRAVITY; bird.y+=bird.vy;
+  if(frame%80===0)addPipe();
+  pipes.forEach(p=>{
+    p.x-=SPEED;
+    if(!p.passed&&p.x+PIPE_W<bird.x){p.passed=true;score++;if(score>best)best=score;}
+  });
+  pipes=pipes.filter(p=>p.x+PIPE_W>0);
+  // collision
+  const bx=bird.x,by=bird.y,br=bird.r-3;
+  if(by+br>H||by-br<0)die();
+  pipes.forEach(p=>{
+    if(bx+br>p.x&&bx-br<p.x+PIPE_W&&(by-br<p.top||by+br>p.bot))die();
+  });
+}
+
+function die(){state='dead';}
+
+function draw(){
+  // sky gradient
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#1a2a4a');g.addColorStop(1,'#2d5a8e');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // pipes
+  pipes.forEach(p=>{
+    ctx.fillStyle='#4CAF50';
+    ctx.fillRect(p.x,0,PIPE_W,p.top);
+    ctx.fillRect(p.x,p.bot,PIPE_W,H-p.bot);
+    ctx.fillStyle='#388E3C';
+    ctx.fillRect(p.x-4,p.top-22,PIPE_W+8,22);
+    ctx.fillRect(p.x-4,p.bot,PIPE_W+8,22);
+  });
+
+  // ground
+  ctx.fillStyle='#8B6914';ctx.fillRect(0,H-30,W,30);
+  ctx.fillStyle='#5D4037';ctx.fillRect(0,H-30,W,4);
+
+  // bird body
+  ctx.save();
+  ctx.translate(bird.x,bird.y);
+  ctx.rotate(Math.min(Math.max(bird.vy*0.06,-0.5),0.8));
+  ctx.fillStyle='#F9A825';
+  ctx.beginPath();ctx.ellipse(0,0,bird.r,bird.r-2,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(6,-4,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(8,-4,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#C15F3C';
+  ctx.beginPath();ctx.moveTo(10,2);ctx.lineTo(20,0);ctx.lineTo(10,6);ctx.closePath();ctx.fill();
+  ctx.restore();
+
+  // score
+  ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.textAlign='center';
+  if(state==='play'||state==='dead')ctx.fillText(score,W/2,60);
+
+  // overlays
+  if(state==='start'){
+    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(0,H/2-60,W,110);
+    ctx.fillStyle='#F9A825';ctx.font='bold 32px sans-serif';ctx.fillText('FLAPPY BIRD',W/2,H/2-18);
+    ctx.fillStyle='#ddd';ctx.font='16px sans-serif';ctx.fillText('Tap or press Space to start',W/2,H/2+20);
+    ctx.fillStyle='#aaa';ctx.font='13px sans-serif';ctx.fillText('Best: '+best,W/2,H/2+44);
+  }
+  if(state==='dead'){
+    ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(0,H/2-70,W,120);
+    ctx.fillStyle='#eb5757';ctx.font='bold 28px sans-serif';ctx.fillText('GAME OVER',W/2,H/2-28);
+    ctx.fillStyle='#ddd';ctx.font='16px sans-serif';ctx.fillText('Score: '+score+'  Best: '+best,W/2,H/2+6);
+    ctx.fillStyle='#aaa';ctx.font='14px sans-serif';ctx.fillText('Tap or press Space to retry',W/2,H/2+34);
+  }
+}
+
+function loop(){tick();draw();requestAnimationFrame(loop);}
+
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();flap();}});
+C.addEventListener('click',flap);
+C.addEventListener('touchstart',e=>{e.preventDefault();flap();},{passive:false});
+
+reset();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wordle</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d0d; display: flex; flex-direction: column; align-items: center; min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #eee; padding: 20px; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.2em; color: #eee; border-bottom: 1px solid #333; padding-bottom: 12px; width: 100%; text-align: center; margin-bottom: 20px; }
+  #msg { min-height: 28px; font-size: 14px; font-weight: 600; text-align: center; color: #f2c94c; margin-bottom: 12px; }
+  #board { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .row { display: flex; gap: 6px; }
+  .tile { width: 58px; height: 58px; border: 2px solid #333; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 800; text-transform: uppercase;
+    transition: background 200ms, border-color 200ms; user-select: none; }
+  .tile.filled { border-color: #666; }
+  .tile.correct { background: #538d4e; border-color: #538d4e; color: #fff; }
+  .tile.present { background: #b59f3b; border-color: #b59f3b; color: #fff; }
+  .tile.absent  { background: #3a3a3c; border-color: #3a3a3c; color: #fff; }
+  .tile.pop { animation: pop 120ms ease both; }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  .tile.shake { animation: shake 400ms ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-4px)} 40%,80%{transform:translateX(4px)} }
+  #keyboard { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .kb-row { display: flex; gap: 6px; }
+  .key { height: 58px; min-width: 43px; padding: 0 6px; border-radius: 4px; border: none;
+    background: #818384; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+    text-transform: uppercase; transition: background 200ms; }
+  .key.wide { min-width: 65px; font-size: 12px; }
+  .key.correct { background: #538d4e; }
+  .key.present { background: #b59f3b; }
+  .key.absent  { background: #3a3a3c; }
+  #new-btn { margin-top: 16px; padding: 10px 24px; background: #538d4e; border: none; border-radius: 8px;
+    color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: none; }
+</style>
+</head>
+<body>
+<h1>WORDLE</h1>
+<div id="msg"></div>
+<div id="board"></div>
+<div id="keyboard"></div>
+<button id="new-btn" onclick="newGame()">New Game</button>
+<script>
+const WORDS = ['about','above','abuse','actor','acute','admit','adopt','adult','after','again','agent','agree','ahead','alarm','album','alert','alike','align','alive','alley','allow','alone','along','alter','angel','anger','angle','angry','anime','ankle','annex','antic','apart','apple','apply','arena','argue','arise','armor','array','arrow','asked','aspen','asset','atlas','attic','audio','audit','augur','aunts','avail','avoid','awake','award','aware','awful','bacon','badge','badly','baked','baker','balls','banal','bands','bangs','basic','basis','batch','began','begin','being','below','bench','bible','birth','black','blade','blame','bland','blank','blaze','bleat','bleed','blend','bless','blind','bliss','block','blood','bloom','blown','board','boats','bogus','bonds','bonus','books','boots','booth','bound','boxer','brain','brand','brave','bread','break','breed','bribe','bride','brief','bring','brink','broad','broke','brook','brown','brunt','brush','build','built','bunch','burst','buyer','cabin','cable','camel','cargo','carry','cases','catch','cause','caves','cease','chain','chair','chalk','chaos','charm','chase','cheap','check','cheek','cheer','chess','chest','chief','child','china','chips','choir','chunk','civic','civil','claim','clamp','clash','class','clean','clear','climb','cling','clock','clone','close','cloth','cloud','coach','coast','comet','comic','comma','comet','comic','comma','count','court','cover','crack','craft','crane','crash','crawl','crazy','cream','crime','crisp','cross','crowd','crown','cruel','crush','curve','cycle','daily','dance','darts','datum','deals','death','debut','decoy','delay','dense','depot','depth','derby','dirty','disco','dizzy','doubt','dough','draft','drain','drama','drank','drawl','drawn','dread','dream','dress','dried','drift','drink','drive','drone','drove','drums','dryer','duchy','duple','duvet','dwarf','eager','early','earth','eight','elect','elite','email','emcee','empty','enemy','enjoy','enter','entry','epoch','equal','erase','error','essay','event','every','exact','exert','exile','exist','extra','fable','facet','faith','false','fancy','fatal','fault','feast','fence','fever','fiber','fiery','fifth','fight','final','first','fixed','flame','flank','flare','flash','flask','fleet','flesh','flies','float','flood','floor','flora','flour','flute','focus','folks','force','forge','forth','forum','found','franc','fraud','freak','freed','fresh','front','frost','froze','fruit','fully','funny','fused','fuzzy','gauge','gavel','gears','genre','ghost','giant','given','gland','glass','glaze','gleam','glean','globe','gloom','gloss','glove','going','grain','grand','grant','grasp','grass','grave','great','greed','green','greet','grief','grill','grind','groan','groin','group','grove','grown','guard','guess','guest','guild','guise','gusto','habit','halls','handy','harsh','haste','haunt','heart','heavy','hello','hence','herbs','hinge','hippo','hobby','holly','honor','horse','hotel','house','hover','human','humor','hurry','hydro','hyena','ideal','image','imply','inbox','index','indie','infer','inner','input','inter','intro','ionic','issue','ivory','jelly','jewel','jiffy','joint','joust','jumbo','juror','kayak','knack','kneel','knife','knock','known','label','lance','large','laser','latch','later','laugh','layer','learn','lease','ledge','legal','lemon','level','light','linen','liner','links','liver','llama','local','lodge','logic','login','loose','lover','lucky','lunar','lyric','magic','major','maker','manga','manor','maple','march','match','mayor','media','mercy','merit','metal','meter','midst','might','minor','minus','mixed','mocha','model','money','monks','month','moral','motto','mount','mourn','movie','mulch','music','naive','navel','nerve','night','ninja','noble','noise','north','noted','novel','nymph','oasis','occur','ocean','olive','opera','optic','orbit','order','other','outer','outdo','oxide','ozone','paint','pairs','panic','paper','pasta','patch','pause','peace','pearl','pedal','penny','perch','peril','photo','piano','pinch','pixel','pizza','place','plain','plane','plant','plate','plaza','plead','pluck','plume','plunk','plush','point','polar','poppy','power','press','pride','prime','print','prior','privy','probe','prone','proof','prose','proud','prove','proxy','psalm','pubic','pulse','punch','pupil','purge','queen','query','quest','queue','quick','quiet','quota','quote','rabbi','radar','radio','raise','rally','ranch','range','rapid','ratio','reach','react','realm','rebel','refer','reign','relax','relic','remix','repay','reply','resin','retro','retry','rhyme','ridge','rifle','right','risky','rivet','robot','rocky','round','route','rover','royal','rugby','ruler','rural','safes','saint','salad','sauce','scale','scare','scene','scope','score','scout','scrap','screw','scrub','sense','seize','serve','seven','shall','shame','shape','share','shark','sharp','sheen','sheep','sheer','sheet','shelf','shell','shift','shirt','shock','shoes','shore','short','shout','shrug','sight','sigma','since','sixth','sized','skill','skull','skunk','slate','slave','sleep','slice','slide','slime','slope','slots','smart','smash','smell','smoke','solid','solve','sorry','south','space','spare','spark','speak','spear','speck','speed','spend','spill','spine','spite','split','spoke','sport','spray','squad','stack','staff','stage','stain','stale','stall','stamp','stand','stark','start','stash','state','stays','steam','steel','steep','steer','stern','stick','stiff','still','stock','stomp','stone','stoop','store','storm','story','stove','strap','straw','strip','stump','style','sugar','suite','super','surge','swamp','swear','sweet','swept','swing','swipe','sword','swore','sworn','syrup','table','taste','teach','tease','teens','tense','tenth','terms','theme','there','thick','thing','think','third','thorn','those','three','threw','throw','thump','tiger','tight','timer','tired','title','today','token','topaz','total','touch','tough','towel','toxic','trace','track','trade','train','trait','trash','tread','treat','trend','trial','tried','troop','trout','trove','truce','truck','truly','tryst','tulip','tuner','tunic','turbo','twist','tying','ultra','unify','union','unite','unity','until','upon','upper','upset','urban','usher','usual','utter','valid','value','vapor','vault','venom','verse','video','vigor','viral','virus','visor','visor','vista','vivid','vocal','vodka','voice','voter','vulva','wager','waltz','water','weary','wedge','weigh','weird','whale','wheat','wheel','where','which','while','white','whole','whose','width','witch','women','world','worry','worse','worst','worth','would','wrath','write','wrote','yacht','yearn','yield','young','yours','youth','zebra','zesty','zippy','zonal'];
+
+const ANSWERS = WORDS.filter(w=>w.length===5);
+let target, guesses, current, done;
+
+function newGame() {
+  target = ANSWERS[Math.floor(Math.random()*ANSWERS.length)].toUpperCase();
+  guesses = []; current = ''; done = false;
+  document.getElementById('msg').textContent = '';
+  document.getElementById('new-btn').style.display = 'none';
+  renderBoard(); renderKeyboard();
+}
+
+function renderBoard() {
+  const b = document.getElementById('board'); b.innerHTML = '';
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement('div'); row.className = 'row';
+    for (let c = 0; c < 5; c++) {
+      const tile = document.createElement('div'); tile.className = 'tile';
+      if (r < guesses.length) {
+        const {word, result} = guesses[r];
+        tile.textContent = word[c];
+        tile.classList.add(result[c]);
+      } else if (r === guesses.length) {
+        if (c < current.length) { tile.textContent = current[c]; tile.classList.add('filled'); }
+      }
+      row.appendChild(tile);
+    }
+    b.appendChild(row);
+  }
+}
+
+function renderKeyboard() {
+  const rows = [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['Enter','z','x','c','v','b','n','m','⌫']];
+  const kb = document.getElementById('keyboard'); kb.innerHTML = '';
+  const state = {};
+  guesses.forEach(({word,result}) => word.split('').forEach((ch,i) => {
+    const prev = state[ch];
+    if (result[i]==='correct') state[ch]='correct';
+    else if (result[i]==='present' && prev!=='correct') state[ch]='present';
+    else if (!prev) state[ch]='absent';
+  }));
+  rows.forEach(row => {
+    const div = document.createElement('div'); div.className = 'kb-row';
+    row.forEach(k => {
+      const btn = document.createElement('button'); btn.className = 'key';
+      if (k==='Enter'||k==='⌫') btn.classList.add('wide');
+      btn.textContent = k;
+      if (state[k]) btn.classList.add(state[k]);
+      btn.addEventListener('click', () => handleKey(k==='⌫'?'Backspace':k));
+      div.appendChild(btn);
+    });
+    kb.appendChild(div);
+  });
+}
+
+function evaluate(guess) {
+  const result = Array(5).fill('absent');
+  const pool = target.split('');
+  guess.split('').forEach((ch,i) => { if (ch===target[i]) { result[i]='correct'; pool[i]=null; }});
+  guess.split('').forEach((ch,i) => { if (result[i]!=='correct') { const j=pool.indexOf(ch); if(j>=0){result[i]='present';pool[j]=null;}}});
+  return result;
+}
+
+function handleKey(k) {
+  if (done) return;
+  if (k==='Backspace') { current=current.slice(0,-1); renderBoard(); return; }
+  if (k==='Enter') {
+    if (current.length<5) { shakeRow(); return; }
+    if (!WORDS.includes(current.toLowerCase())) { showMsg('Not in word list'); shakeRow(); return; }
+    const result = evaluate(current);
+    guesses.push({word:current, result});
+    current = '';
+    renderBoard(); renderKeyboard();
+    if (result.every(r=>r==='correct')) { showMsg('Genius! 🎉'); done=true; document.getElementById('new-btn').style.display='block'; return; }
+    if (guesses.length===6) { showMsg('The word was '+target); done=true; document.getElementById('new-btn').style.display='block'; }
+    return;
+  }
+  if (/^[A-Za-z]$/.test(k) && current.length<5) { current+=k.toUpperCase(); renderBoard(); popTile(); }
+}
+
+function showMsg(m) { document.getElementById('msg').textContent = m; }
+function shakeRow() {
+  const rows = document.querySelectorAll('.row');
+  const r = rows[guesses.length]; if (!r) return;
+  r.querySelectorAll('.tile').forEach(t => { t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake'); });
+}
+function popTile() {
+  const rows = document.querySelectorAll('.row');
+  const r = rows[guesses.length]; if (!r) return;
+  const tile = r.querySelectorAll('.tile')[current.length-1]; if (!tile) return;
+  tile.classList.remove('pop'); void tile.offsetWidth; tile.classList.add('pop');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey||e.metaKey||e.altKey) return;
+  handleKey(e.key==='Backspace'?'Backspace':e.key==='Enter'?'Enter':e.key.toUpperCase());
+});
+
+newGame();
+</script>
+</body>
+</html>

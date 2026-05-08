@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tetris</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d0d; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #eee; gap: 24px; }
+  canvas { border: 2px solid #333; border-radius: 8px; display: block; }
+  #side { display: flex; flex-direction: column; gap: 16px; min-width: 100px; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #666; margin-bottom: 4px; }
+  .val { font-size: 24px; font-weight: 700; color: #C15F3C; }
+  #next-canvas { border: 1px solid #333; border-radius: 6px; background: #111; }
+  #msg { font-size: 13px; color: #888; }
+</style>
+</head>
+<body>
+<canvas id="c" width="200" height="400"></canvas>
+<div id="side">
+  <div><div class="label">Score</div><div class="val" id="score">0</div></div>
+  <div><div class="label">Lines</div><div class="val" id="lines">0</div></div>
+  <div><div class="label">Level</div><div class="val" id="level">1</div></div>
+  <div><div class="label">Next</div><canvas id="next-canvas" width="80" height="80"></canvas></div>
+  <div id="msg">← → Move<br>↑ Rotate<br>↓ Drop<br>Space Hard drop</div>
+</div>
+<script>
+const C=document.getElementById('c'),ctx=C.getContext('2d');
+const NC=document.getElementById('next-canvas'),nctx=NC.getContext('2d');
+const SZ=20,COLS=10,ROWS=20;
+const COLORS=['','#C15F3C','#5b82f8','#6fcf97','#f2c94c','#bb6bd9','#eb5757','#56ccf2'];
+const PIECES=[
+  [[1,1,1,1]],
+  [[2,2],[2,2]],
+  [[0,3,0],[3,3,3]],
+  [[4,0],[4,0],[4,4]],
+  [[0,5],[0,5],[5,5]],
+  [[6,6,0],[0,6,6]],
+  [[0,7,7],[7,7,0]],
+];
+
+let board,piece,px,py,next,score,lines,level,alive,loop;
+
+function newBoard(){return Array.from({length:ROWS},()=>Array(COLS).fill(0));}
+function randPiece(){return JSON.parse(JSON.stringify(PIECES[Math.floor(Math.random()*PIECES.length)]));}
+
+function init(){
+  board=newBoard(); score=0; lines=0; level=1; alive=true;
+  piece=randPiece(); next=randPiece(); spawn();
+  update();
+  clearInterval(loop); loop=setInterval(drop,speed());
+}
+
+function speed(){return Math.max(100,600-level*60);}
+
+function spawn(){px=Math.floor((COLS-piece[0].length)/2); py=0;}
+
+function rotate(m){return m[0].map((_,i)=>m.map(r=>r[i]).reverse());}
+
+function fits(p,x,y){
+  return p.every((row,r)=>row.every((v,c)=>!v||
+    (x+c>=0&&x+c<COLS&&y+r>=0&&y+r<ROWS&&!board[y+r][x+c])));
+}
+
+function lock(){
+  piece.forEach((row,r)=>row.forEach((v,c)=>{if(v)board[py+r][px+c]=v;}));
+  let cleared=0;
+  for(let r=ROWS-1;r>=0;r--){
+    if(board[r].every(v=>v)){board.splice(r,1);board.unshift(Array(COLS).fill(0));cleared++;r++;}
+  }
+  if(cleared){lines+=cleared;score+=cleared*100*level;level=Math.floor(lines/10)+1;clearInterval(loop);loop=setInterval(drop,speed());}
+  piece=next; next=randPiece(); spawn();
+  if(!fits(piece,px,py)){alive=false;clearInterval(loop);ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(0,0,C.width,C.height);ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.textAlign='center';ctx.fillText('GAME OVER',C.width/2,C.height/2);ctx.font='13px sans-serif';ctx.fillStyle='#aaa';ctx.fillText('Press R to restart',C.width/2,C.height/2+28);}
+  update();
+}
+
+function drop(){if(fits(piece,px,py+1))py++;else lock();draw();}
+
+function draw(){
+  ctx.fillStyle='#0d0d0d';ctx.fillRect(0,0,C.width,C.height);
+  // grid
+  ctx.strokeStyle='#1a1a1a';ctx.lineWidth=0.5;
+  for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*SZ,0);ctx.lineTo(x*SZ,ROWS*SZ);ctx.stroke();}
+  for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*SZ);ctx.lineTo(COLS*SZ,y*SZ);ctx.stroke();}
+  // board
+  board.forEach((row,r)=>row.forEach((v,c)=>{if(v){ctx.fillStyle=COLORS[v];ctx.fillRect(c*SZ+1,r*SZ+1,SZ-2,SZ-2);}}));
+  // ghost
+  let gy=py;while(fits(piece,px,gy+1))gy++;
+  piece.forEach((row,r)=>row.forEach((v,c)=>{if(v){ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect((px+c)*SZ+1,(gy+r)*SZ+1,SZ-2,SZ-2);}}));
+  // piece
+  piece.forEach((row,r)=>row.forEach((v,c)=>{if(v){ctx.fillStyle=COLORS[v];ctx.fillRect((px+c)*SZ+1,(py+r)*SZ+1,SZ-2,SZ-2);}}));
+  // next
+  nctx.fillStyle='#111';nctx.fillRect(0,0,80,80);
+  const ox=Math.floor((4-next[0].length)/2),oy=Math.floor((4-next.length)/2);
+  next.forEach((row,r)=>row.forEach((v,c)=>{if(v){nctx.fillStyle=COLORS[v];nctx.fillRect((ox+c)*18+2,(oy+r)*18+2,16,16);}}));
+}
+
+function update(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('lines').textContent=lines;
+  document.getElementById('level').textContent=level;
+}
+
+document.addEventListener('keydown',e=>{
+  if(!alive){if(e.key==='r'||e.key==='R')init();return;}
+  if(e.key==='ArrowLeft'){if(fits(piece,px-1,py))px--;}
+  else if(e.key==='ArrowRight'){if(fits(piece,px+1,py))px++;}
+  else if(e.key==='ArrowDown'){if(fits(piece,px,py+1))py++;else lock();}
+  else if(e.key==='ArrowUp'){const r=rotate(piece);if(fits(r,px,py))piece=r;}
+  else if(e.key===' '){e.preventDefault();while(fits(piece,px,py+1))py++;lock();}
+  else return;
+  draw();
+});
+
+init();
+</script>
+</body>
+</html>
