@@ -92,13 +92,6 @@ function enterHome() {
     const inner = socAvatar.querySelector('.soc-avatar');
     if (inner) inner.textContent = init;
   }
-  // Show greeting
-  const greetEl = document.getElementById('dash-greeting');
-  if (greetEl) {
-    const hour = new Date().getHours();
-    const timeLabel = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-    greetEl.textContent = `${timeLabel}, ${currentUser?.user_metadata?.username || 'there'}.`;
-  }
   loadDashboardStats();
   loadLatestAnnouncement();
   subscribeAnnouncements();
@@ -302,6 +295,7 @@ async function loadDashboardStats() {
    CLOAK AI CHATBOT
 ════════════════════════════════════════════ */
 const CLOAK_API   = 'https://api.usecloak.org/v1/chat/completions';
+const CLOAK_KEY   = 'APIKEY';
 const CLOAK_MODEL = 'gpt-4o';
 
 let chatHistory = [
@@ -313,6 +307,20 @@ function chatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
 }
 
+function toggleChat() {
+  const popup = document.getElementById('cloak-popup');
+  if (!popup) return;
+  const opening = !popup.classList.contains('open');
+  popup.classList.toggle('open');
+  if (opening) {
+    popup.style.animation = 'none';
+    popup.offsetHeight;
+    popup.style.animation = '';
+    const input = document.getElementById('chat-input');
+    if (input) setTimeout(() => input.focus(), 50);
+  }
+}
+
 async function sendChatMessage() {
   const input   = document.getElementById('chat-input');
   const content = input?.value.trim();
@@ -322,13 +330,10 @@ async function sendChatMessage() {
   chatHistory.push({ role: 'user', content });
   renderChatMessages();
 
-  // Typing indicator
   chatTyping = true;
-  const typingId = 'chat-typing-' + Date.now();
   const messagesEl = document.getElementById('chat-messages');
   if (messagesEl) {
     const typingEl = document.createElement('div');
-    typingEl.id = typingId;
     typingEl.className = 'chat-bubble bot typing';
     typingEl.textContent = '…';
     messagesEl.appendChild(typingEl);
@@ -338,7 +343,7 @@ async function sendChatMessage() {
   try {
     const res = await fetch(CLOAK_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CLOAK_KEY}` },
       body: JSON.stringify({ model: CLOAK_MODEL, messages: chatHistory, stream: false }),
     });
     const json = await res.json();
@@ -355,7 +360,6 @@ async function sendChatMessage() {
 function renderChatMessages() {
   const el = document.getElementById('chat-messages');
   if (!el) return;
-  // Skip first message (system prompt)
   const visible = chatHistory.slice(1);
   el.innerHTML = visible.map((m, i) => {
     const cls = m.role === 'user' ? 'user' : 'bot';

@@ -156,27 +156,6 @@
     <!-- DASHBOARD BODY -->
     <div class="dashboard-body">
 
-      <!-- LEFT: Cloak AI Chatbot -->
-      <div class="dash-chatbot panel-card" style="animation: fadeUp 400ms var(--ease) both">
-        <div class="panel-card-head" style="border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 0;">
-          <div>
-            <div id="dash-greeting" style="font-family:var(--serif);font-size:17px;font-weight:600;color:var(--text);margin-bottom:2px">Good morning.</div>
-            <div style="font-size:12px;color:var(--text-faint)">Ask Cloak AI anything</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="width:7px;height:7px;background:var(--success);border-radius:50%;display:inline-block;animation:pulse 2s ease-in-out infinite"></span>
-            <span style="font-size:11px;color:var(--success)">Cloak AI</span>
-          </div>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="chat-bubble bot" style="animation:none">Hi! I'm Cloak AI. Ask me anything — homework help, study tips, school questions, whatever you need.</div>
-        </div>
-        <div class="chat-input-row">
-          <textarea class="chat-input" id="chat-input" rows="2" placeholder="Ask anything…" onkeydown="chatKey(event)"></textarea>
-          <button class="btn btn-primary" style="align-self:flex-end" onclick="sendChatMessage()">Send</button>
-        </div>
-      </div>
-
       <!-- RIGHT COLUMN: Clock + Announcements -->
       <div class="dash-right-col">
 
@@ -472,6 +451,31 @@
       <input id="thread-input" class="soc-input" placeholder="Type a message…" onkeydown="SocialLayer.threadInputKey(event)"/>
       <button class="soc-btn primary" onclick="SocialLayer.sendMessage()">Send</button>
     </div>
+  </div>
+</div>
+
+<!-- CLOAK AI BUBBLE -->
+<button class="cloak-bubble" id="cloak-bubble" onclick="toggleChat()" title="Ask Cloak AI">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  <span class="cloak-bubble-label">Cloak AI</span>
+</button>
+
+<div class="cloak-popup" id="cloak-popup">
+  <div class="cloak-popup-bar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:7px;height:7px;background:var(--success);border-radius:50%;display:inline-block;animation:pulse 2s ease-in-out infinite;flex-shrink:0"></span>
+      <span style="font-size:13px;font-weight:600;color:var(--text)">Cloak AI</span>
+    </div>
+    <button class="cloak-popup-close" onclick="toggleChat()" title="Close">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-bubble bot" style="animation:none">Hi! I'm Cloak AI. Ask me anything — homework help, study tips, school questions, whatever you need.</div>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" rows="2" placeholder="Ask anything…" onkeydown="chatKey(event)"></textarea>
+    <button class="btn btn-primary" style="align-self:flex-end;padding:8px 14px;font-size:13px" onclick="sendChatMessage()">Send</button>
   </div>
 </div>
 
