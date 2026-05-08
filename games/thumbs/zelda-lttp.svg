@@ -1,0 +1,34 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark Hyrule background -->
+  <rect width="200" height="140" fill="#0a1a0a"/>
+  <!-- Stone floor tiles -->
+  <g fill="#141e14" stroke="#1a2a1a" stroke-width="0.5">
+    <rect x="0"   y="0"  width="40" height="40"/><rect x="40"  y="0"  width="40" height="40"/>
+    <rect x="80"  y="0"  width="40" height="40"/><rect x="120" y="0"  width="40" height="40"/>
+    <rect x="160" y="0"  width="40" height="40"/>
+    <rect x="20"  y="40" width="40" height="40"/><rect x="60"  y="40" width="40" height="40"/>
+    <rect x="100" y="40" width="40" height="40"/><rect x="140" y="40" width="40" height="40"/>
+  </g>
+  <!-- Triforce -->
+  <g transform="translate(76, 14)" fill="#DAA520" opacity="0.9">
+    <polygon points="24,0 48,42 0,42"/>
+    <polygon points="0,44 24,86 -24,86"/>
+    <polygon points="48,44 72,86 24,86"/>
+  </g>
+  <!-- Link (simplified) -->
+  <!-- Hat -->
+  <polygon points="100,72 92,80 108,80" fill="#2d7a2d"/>
+  <rect x="90" y="79" width="20" height="8" fill="#2d7a2d" rx="1"/>
+  <!-- Face -->
+  <rect x="92" y="87" width="16" height="10" fill="#FFCC99"/>
+  <!-- Tunic -->
+  <rect x="88" y="97" width="24" height="14" fill="#2d7a2d"/>
+  <!-- Shield -->
+  <rect x="108" y="98" width="10" height="12" rx="1" fill="#1a4ab8"/>
+  <polygon points="108,105 118,105 113,115" fill="#cc2222"/>
+  <!-- Sword -->
+  <line x1="80" y1="90" x2="90" y2="100" stroke="#aaaacc" stroke-width="2.5"/>
+  <rect x="81" y="95" width="6" height="2" fill="#8B6914" transform="rotate(-45 84 96)"/>
+  <!-- label -->
+  <text x="100" y="135" font-family="monospace" font-size="9" font-weight="bold" fill="#DAA520" text-anchor="middle" letter-spacing="1">ZELDA: A LINK TO THE PAST</text>
+</svg>

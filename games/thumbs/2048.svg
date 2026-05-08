@@ -1,0 +1,22 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" font-family="Arial Black, sans-serif">
+  <rect width="200" height="140" fill="#FAD9A0"/>
+  <!-- tiles row 1 -->
+  <rect x="8"  y="8" width="42" height="42" rx="4" fill="#EDE0C8"/>
+  <rect x="54" y="8" width="42" height="42" rx="4" fill="#EFC475"/>
+  <text x="75" y="37" font-size="22" font-weight="900" fill="#f9f6f2" text-anchor="middle">4</text>
+  <rect x="100" y="8" width="42" height="42" rx="4" fill="#EE9046"/>
+  <text x="121" y="37" font-size="20" font-weight="900" fill="#f9f6f2" text-anchor="middle">16</text>
+  <rect x="146" y="8" width="42" height="42" rx="4" fill="#ED7132"/>
+  <text x="167" y="37" font-size="18" font-weight="900" fill="#f9f6f2" text-anchor="middle">32</text>
+  <!-- tiles row 2 -->
+  <rect x="8"  y="54" width="42" height="42" rx="4" fill="#EFC475"/>
+  <text x="29" y="83" font-size="22" font-weight="900" fill="#f9f6f2" text-anchor="middle">2</text>
+  <rect x="54" y="54" width="42" height="42" rx="4" fill="#EDE0C8"/>
+  <rect x="100" y="54" width="42" height="42" rx="4" fill="#ED7132"/>
+  <text x="121" y="83" font-size="18" font-weight="900" fill="#f9f6f2" text-anchor="middle">64</text>
+  <rect x="146" y="54" width="42" height="42" rx="4" fill="#EDBA5D"/>
+  <text x="167" y="83" font-size="15" font-weight="900" fill="#f9f6f2" text-anchor="middle">128</text>
+  <!-- banner -->
+  <rect x="0" y="104" width="200" height="36" fill="#BBADA0"/>
+  <text x="100" y="130" font-size="26" font-weight="900" fill="#f9f6f2" text-anchor="middle">2048</text>
+</svg>

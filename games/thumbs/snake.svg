@@ -1,0 +1,26 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="140" fill="#0d0d0d"/>
+  <!-- grid dots -->
+  <g fill="#1e1e1e">
+    <circle cx="20" cy="20" r="1.5"/><circle cx="40" cy="20" r="1.5"/><circle cx="60" cy="20" r="1.5"/><circle cx="80" cy="20" r="1.5"/>
+    <circle cx="100" cy="20" r="1.5"/><circle cx="120" cy="20" r="1.5"/><circle cx="140" cy="20" r="1.5"/><circle cx="160" cy="20" r="1.5"/><circle cx="180" cy="20" r="1.5"/>
+    <circle cx="20" cy="40" r="1.5"/><circle cx="40" cy="40" r="1.5"/><circle cx="60" cy="40" r="1.5"/>
+    <circle cx="100" cy="40" r="1.5"/><circle cx="120" cy="40" r="1.5"/><circle cx="140" cy="40" r="1.5"/><circle cx="160" cy="40" r="1.5"/><circle cx="180" cy="40" r="1.5"/>
+  </g>
+  <!-- snake body - horizontal then turns -->
+  <rect x="12" y="72" width="16" height="16" rx="3" fill="#C15F3C"/>
+  <rect x="32" y="72" width="16" height="16" rx="3" fill="#d4744e"/>
+  <rect x="52" y="72" width="16" height="16" rx="3" fill="#d4744e"/>
+  <rect x="72" y="72" width="16" height="16" rx="3" fill="#d4744e"/>
+  <rect x="72" y="52" width="16" height="16" rx="3" fill="#d4744e"/>
+  <rect x="72" y="32" width="16" height="16" rx="3" fill="#d4744e"/>
+  <rect x="92" y="32" width="16" height="16" rx="3" fill="#bf6640"/>
+  <!-- apple -->
+  <circle cx="150" cy="80" r="10" fill="#6fcf97"/>
+  <rect x="149" y="67" width="2" height="7" fill="#4a9b6f" rx="1"/>
+  <!-- head eye -->
+  <circle cx="17" cy="76" r="2" fill="#fff"/>
+  <circle cx="18" cy="77" r="1" fill="#111"/>
+  <!-- label -->
+  <text x="100" y="125" font-family="monospace" font-size="14" font-weight="bold" fill="#6fcf97" text-anchor="middle" letter-spacing="4">SNAKE</text>
+</svg>

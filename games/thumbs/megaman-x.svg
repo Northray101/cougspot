@@ -1,0 +1,51 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky with SNES gradients -->
+  <defs>
+    <linearGradient id="mmsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a2e"/>
+      <stop offset="100%" stop-color="#1a1a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="140" fill="url(#mmsky)"/>
+  <!-- Buildings silhouette -->
+  <rect x="0"   y="60" width="30" height="60" fill="#0d0d3a"/>
+  <rect x="5"   y="50" width="20" height="10" fill="#0d0d3a"/>
+  <rect x="35"  y="40" width="40" height="80" fill="#0d0d3a"/>
+  <rect x="40"  y="30" width="30" height="12" fill="#0d0d3a"/>
+  <rect x="130" y="50" width="35" height="70" fill="#0d0d3a"/>
+  <rect x="170" y="70" width="30" height="50" fill="#0d0d3a"/>
+  <!-- Building windows -->
+  <g fill="#ffff80" opacity="0.6">
+    <rect x="10" y="65" width="5" height="4"/><rect x="17" y="65" width="5" height="4"/>
+    <rect x="45" y="45" width="5" height="4"/><rect x="55" y="45" width="5" height="4"/>
+    <rect x="45" y="55" width="5" height="4"/><rect x="55" y="55" width="5" height="4"/>
+  </g>
+  <!-- Ground -->
+  <rect x="0" y="110" width="200" height="30" fill="#1a1a5e"/>
+  <rect x="0" y="110" width="200" height="3"  fill="#3a3a9e"/>
+  <!-- Mega Man X body -->
+  <!-- Helmet -->
+  <rect x="84" y="52" width="32" height="22" rx="4" fill="#1a6fd4"/>
+  <rect x="88" y="48" width="24" height="10" rx="3" fill="#1a6fd4"/>
+  <!-- Face visor -->
+  <rect x="88" y="58" width="24" height="10" rx="2" fill="#5bbaff"/>
+  <!-- Eyes -->
+  <rect x="91" y="60" width="8"  height="5" rx="1" fill="#fff"/>
+  <rect x="101" y="60" width="8" height="5" rx="1" fill="#fff"/>
+  <!-- Body -->
+  <rect x="82" y="74" width="36" height="22" rx="3" fill="#1a6fd4"/>
+  <!-- Arm cannon -->
+  <rect x="118" y="80" width="24" height="10" rx="5" fill="#1a5ab8"/>
+  <circle cx="143" cy="85" r="6" fill="#5bbaff"/>
+  <!-- Legs -->
+  <rect x="84"  y="96" width="14" height="16" rx="2" fill="#1a6fd4"/>
+  <rect x="102" y="96" width="14" height="16" rx="2" fill="#1a6fd4"/>
+  <!-- Boots -->
+  <rect x="82" y="110" width="16" height="8" rx="2" fill="#0a4a9e"/>
+  <rect x="102" y="110" width="16" height="8" rx="2" fill="#0a4a9e"/>
+  <!-- Energy shot -->
+  <ellipse cx="160" cy="85" rx="8" ry="5" fill="#5bbaff" opacity="0.9"/>
+  <ellipse cx="165" cy="85" rx="4" ry="3" fill="#fff" opacity="0.7"/>
+  <!-- label -->
+  <text x="100" y="136" font-family="monospace" font-size="12" font-weight="bold" fill="#5bbaff" text-anchor="middle" letter-spacing="2">MEGA MAN X</text>
+</svg>
