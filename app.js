@@ -294,14 +294,12 @@ async function loadDashboardStats() {
 /* ════════════════════════════════════════════
    CLOAK AI CHATBOT
 ════════════════════════════════════════════ */
-const CLOAK_API   = 'https://api.usecloak.org/v1/chat/completions';
-const CLOAK_KEY   = 'APIKEY';
-const CLOAK_MODEL = 'gpt-4o';
+const CLOAK_API    = 'https://api.usecloak.org/v1/chat';
+const CLOAK_MODEL  = 'pneuma';
+const CLOAK_SYSTEM = 'You are a helpful assistant for Norco High School students. Be concise, friendly, and helpful with school-related topics, homework, and general questions.';
 
-let chatHistory = [
-  { role: 'system', content: 'You are a helpful assistant for Norco High School students. Be concise, friendly, and helpful with school-related topics, homework, and general questions.' }
-];
-let chatTyping = false;
+let chatHistory = []; // { role: 'user'|'assistant', message: '...' }
+let chatTyping  = false;
 
 function chatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
@@ -310,12 +308,8 @@ function chatKey(e) {
 function toggleChat() {
   const popup = document.getElementById('cloak-popup');
   if (!popup) return;
-  const opening = !popup.classList.contains('open');
   popup.classList.toggle('open');
-  if (opening) {
-    popup.style.animation = 'none';
-    popup.offsetHeight;
-    popup.style.animation = '';
+  if (popup.classList.contains('open')) {
     const input = document.getElementById('chat-input');
     if (input) setTimeout(() => input.focus(), 50);
   }
@@ -327,7 +321,7 @@ async function sendChatMessage() {
   if (!content || chatTyping) return;
   input.value = '';
 
-  chatHistory.push({ role: 'user', content });
+  chatHistory.push({ role: 'user', message: content });
   renderChatMessages();
 
   chatTyping = true;
@@ -343,14 +337,21 @@ async function sendChatMessage() {
   try {
     const res = await fetch(CLOAK_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CLOAK_KEY}` },
-      body: JSON.stringify({ model: CLOAK_MODEL, messages: chatHistory, stream: false }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: CLOAK_MODEL,
+        message: content,
+        chat_history: chatHistory.slice(0, -1),
+        system_prompt: CLOAK_SYSTEM,
+        temperature: 0.7,
+      }),
     });
     const json = await res.json();
-    const reply = json?.choices?.[0]?.message?.content || json?.error?.message || 'No response received.';
-    chatHistory.push({ role: 'assistant', content: reply });
+    if (json.error) throw new Error(json.error);
+    const reply = json.text || 'No response received.';
+    chatHistory.push({ role: 'assistant', message: reply });
   } catch (e) {
-    chatHistory.push({ role: 'assistant', content: 'Could not reach Cloak AI. Check your connection.' });
+    chatHistory.push({ role: 'assistant', message: 'Could not reach Cloak AI. Check your connection.' });
   }
 
   chatTyping = false;
@@ -360,10 +361,9 @@ async function sendChatMessage() {
 function renderChatMessages() {
   const el = document.getElementById('chat-messages');
   if (!el) return;
-  const visible = chatHistory.slice(1);
-  el.innerHTML = visible.map((m, i) => {
+  el.innerHTML = chatHistory.map((m, i) => {
     const cls = m.role === 'user' ? 'user' : 'bot';
-    return `<div class="chat-bubble ${cls}" style="animation-delay:${i * 20}ms">${escHtml(m.content)}</div>`;
+    return `<div class="chat-bubble ${cls}" style="animation-delay:${i * 20}ms">${escHtml(m.message)}</div>`;
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
