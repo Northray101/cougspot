@@ -85,7 +85,13 @@ function checkRateLimit() {
 }
 
 /* ── State ── */
+// Mirror to window so social.js (separate IIFE) can read it via window.currentUser
 let currentUser     = null;
+Object.defineProperty(window, 'currentUser', {
+  get() { return currentUser; },
+  set(v) { currentUser = v; },
+  configurable: true,
+});
 let currentPostTag  = 'general';
 let postAnonMode    = false;
 let commentAnonMode = {};  // keyed by post_id
