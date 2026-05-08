@@ -79,26 +79,47 @@ function avatarHTML(profile, size) {
 
 async function bootstrapProfile() {
   const uid = getUid();
-  if (!uid) return;
+  if (!uid) return null;
   const { data } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
   if (data) { state.profile = data; state.profilesCache[uid] = data; return data; }
-  const username = getUname();
-  const { data: created } = await sb.from('profiles').upsert({
-    id: uid,
-    username,
-    display_name: username,
-    avatar_emoji: null,
-  }, { onConflict: 'id' }).select().single();
-  state.profile = created;
-  state.profilesCache[uid] = created;
-  return created;
+  // No row: create one. Username may collide with someone else's, so retry with a suffix.
+  const base = getUname();
+  let attempt = 0;
+  while (attempt < 4) {
+    const uname = attempt === 0 ? base : `${base}_${uid.slice(0,4)}${attempt>1?attempt:''}`;
+    const { data: created, error } = await sb.from('profiles').insert({
+      id: uid, username: uname, display_name: uname, avatar_emoji: null,
+    }).select().single();
+    if (created) { state.profile = created; state.profilesCache[uid] = created; return created; }
+    if (error && /duplicate|unique/i.test(error.message || '')) { attempt++; continue; }
+    break;
+  }
+  return null;
 }
 
 async function loadProfile(userId) {
   if (state.profilesCache[userId]) return state.profilesCache[userId];
   const { data } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
-  if (data) state.profilesCache[userId] = data;
-  return data;
+  if (data) { state.profilesCache[userId] = data; return data; }
+  // Self-heal: if it's me, bootstrap. Otherwise synthesize a minimal stub
+  // from any post this user has authored so the UI never shows "not found".
+  if (userId === getUid()) {
+    const created = await bootstrapProfile();
+    if (created) return created;
+  }
+  const { data: post } = await sb.from('posts')
+    .select('username').eq('user_id', userId).not('is_anon','is',true)
+    .order('created_at',{ascending:false}).limit(1).maybeSingle();
+  const stub = {
+    id: userId,
+    username: post?.username || 'user',
+    display_name: post?.username || 'User',
+    bio: null,
+    avatar_emoji: null,
+    _stub: true,
+  };
+  state.profilesCache[userId] = stub;
+  return stub;
 }
 
 async function loadProfilesBulk(ids) {
@@ -112,7 +133,7 @@ async function openProfileView(userId) {
   const me = getUid();
   if (!userId) userId = me;
   const profile = await loadProfile(userId);
-  if (!profile) { window.toast && window.toast('Profile not found.', 'error'); return; }
+  if (!profile) { window.toast && window.toast('Could not load profile. Try again.', 'error'); return; }
 
   // Counts + relationship
   const [{ count: followersCount }, { count: followingCount }, friendStatus] = await Promise.all([
