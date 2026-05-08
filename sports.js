@@ -132,7 +132,7 @@ function renderSkeletons() {
         ${skeletonRows(3)}
       </div>
       <div class="sport-card-footer" id="footer-${s.id}">
-        <span style="color:var(--faint)">Loading schedule...</span>
+        <span style="color:var(--text-faint)">Loading schedule...</span>
       </div>
     </div>`).join('');
 }
@@ -159,10 +159,10 @@ function renderCard(slug) {
 
   if (data.error || !data.games || data.games.length === 0) {
     gamesEl.innerHTML = `
-      <div style="padding:8px 0;font-size:12px;color:var(--faint);font-weight:300">
+      <div style="padding:8px 0;font-size:12px;color:var(--text-faint);font-weight:300">
         ${data.error ? 'Schedule unavailable right now.' : 'No games found for this season.'}
         <a href="${MAXPREPS_BASE}/${slug}/schedule/" target="_blank"
-           style="color:var(--violet);text-decoration:none;margin-left:6px">
+           style="color:var(--accent);text-decoration:none;margin-left:6px">
           View on MaxPreps ↗
         </a>
       </div>`;
@@ -192,13 +192,13 @@ function renderCard(slug) {
       const bg    = isWin ? 'rgba(22,101,52,0.15)' : 'rgba(127,29,29,0.2)';
       resultBadge = `<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:${bg};color:${color};font-weight:500">${escHtml(g.result.replace('(forfeit)', '(FF)'))}</span>`;
     } else if (g.time) {
-      resultBadge = `<span style="font-size:11px;color:var(--electric)">${escHtml(g.time)}</span>`;
+      resultBadge = `<span style="font-size:11px;color:var(--accent)">${escHtml(g.time)}</span>`;
     }
 
     return `<div class="game-row">
       <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0">
         <span class="game-opponent" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(g.opponent)}</span>
-        <span style="font-size:10px;color:var(--faint)">${escHtml(g.type)}</span>
+        <span style="font-size:10px;color:var(--text-faint)">${escHtml(g.type)}</span>
       </div>
       <span class="game-date">${escHtml(g.date)}</span>
       ${resultBadge}
@@ -210,7 +210,7 @@ function renderCard(slug) {
     const remaining = upcoming.length > 3 ? upcoming.length - 3 : 0;
     footerEl.innerHTML = `
       <a href="${MAXPREPS_BASE}/${slug}/schedule/" target="_blank"
-         style="color:var(--violet);text-decoration:none;font-size:11px;font-weight:400">
+         style="color:var(--accent);text-decoration:none;font-size:11px;font-weight:400">
         ${remaining > 0 ? `+${remaining} more · ` : ''}Full schedule on MaxPreps ↗
       </a>`;
   }
@@ -230,9 +230,9 @@ function filterSports(season) {
   });
   const active = document.getElementById('filter-' + season);
   if (active) {
-    active.style.background  = 'rgba(26,58,219,0.1)';
-    active.style.borderColor = '#1a3adb';
-    active.style.color       = '#93aeff';
+    active.style.background  = 'var(--accent-soft)';
+    active.style.borderColor = 'var(--accent)';
+    active.style.color       = 'var(--accent)';
   }
 
   renderSkeletons();

@@ -181,7 +181,7 @@ async function doLogin() {
 function startSignup() {
   pinTarget = 'signup';
   currentPin = '';
-  document.getElementById('pin-gate-title').textContent  = 'Enter Site PIN';
+  document.getElementById('pin-gate-title').textContent  = 'Enter site PIN';
   document.getElementById('pin-gate-sub').textContent    = 'This site is invite-only. Enter the PIN to continue.';
   document.getElementById('pin-gate-error').classList.remove('show');
   updatePinDots('pg');
@@ -295,14 +295,14 @@ async function loadPosts(filter) {
   // Update filter button states
   document.querySelectorAll('.feed-filter-btn').forEach(b => {
     const isActive = b.dataset.filter === activeFilter;
-    b.style.background  = isActive ? 'rgba(26,58,219,0.12)' : '';
-    b.style.borderColor = isActive ? '#1a3adb' : '';
-    b.style.color       = isActive ? '#93aeff' : '';
+    b.style.background  = isActive ? 'var(--accent-soft)' : '';
+    b.style.borderColor = isActive ? 'var(--accent)'      : '';
+    b.style.color       = isActive ? 'var(--accent)'      : '';
   });
 
   const container = document.getElementById('posts-container');
   if (!container) return;
-  container.innerHTML = `<div class="empty-state"><div class="spinner" style="color:var(--violet);margin:0 auto 10px;width:22px;height:22px"></div><p>Loading...</p></div>`;
+  container.innerHTML = `<div class="empty-state"><div class="spinner" style="color:var(--accent);margin:0 auto 10px;width:22px;height:22px"></div><p>Loading...</p></div>`;
 
   let query = sb.from('posts').select('*, comment_count:comments(count)').eq('hidden', false).order('created_at', { ascending: false }).limit(40);
   if (activeFilter !== 'all') query = query.eq('tag', activeFilter);
@@ -327,9 +327,9 @@ function renderPostCard(p) {
   const profileClick = (!isAnon && ownerId) ? `onclick="SocialLayer && SocialLayer.openProfileView('${ownerId}')" style="cursor:pointer"` : '';
   return `<div class="post-card" id="post-${p.id}" data-post-id="${p.id}" data-user-id="${ownerId}">
     <div class="post-header">
-      <div class="avatar" ${profileClick} style="${isSocial ? 'background:var(--violet);' : ''}${(!isAnon && ownerId) ? 'cursor:pointer;' : ''}">${initials}</div>
+      <div class="avatar" ${profileClick} style="${isSocial ? 'background:var(--accent);' : ''}${(!isAnon && ownerId) ? 'cursor:pointer;' : ''}">${initials}</div>
       <div class="post-meta">
-        <div class="post-name" ${profileClick}>${dispName}${isSocial ? ' <span style="font-size:10px;color:var(--violet);font-weight:500">· Social</span>' : ''}</div>
+        <div class="post-name" ${profileClick}>${dispName}${isSocial ? ' <span style="font-size:10px;color:var(--accent);font-weight:500">· Social</span>' : ''}</div>
         <div class="post-time">${time}</div>
       </div>
       <span class="post-tag ${p.tag || 'general'}">${p.tag || 'general'}</span>
@@ -352,16 +352,16 @@ function setPostTag(tag, el) {
   document.querySelectorAll('.compose-tags .tag-btn').forEach(b => {
     b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
   });
-  if (el) { el.style.background = 'rgba(26,58,219,0.12)'; el.style.borderColor = '#1a3adb'; el.style.color = '#93aeff'; }
+  if (el) { el.style.background = 'var(--accent-soft)'; el.style.borderColor = 'var(--accent)'; el.style.color = 'var(--accent)'; }
 }
 
 function toggleAnonPost() {
   postAnonMode = !postAnonMode;
   const btn = document.getElementById('anon-post-btn');
   if (btn) {
-    btn.style.background  = postAnonMode ? 'rgba(123,94,248,0.15)' : '';
-    btn.style.borderColor = postAnonMode ? '#7b5ef8' : '';
-    btn.style.color       = postAnonMode ? '#c4b5fd' : '';
+    btn.style.background  = postAnonMode ? 'var(--accent-soft)' : '';
+    btn.style.borderColor = postAnonMode ? 'var(--accent)'      : '';
+    btn.style.color       = postAnonMode ? 'var(--accent)'      : '';
     btn.title = postAnonMode ? 'Posting anonymously — click to switch back' : 'Post anonymously';
   }
 }
@@ -429,7 +429,7 @@ async function toggleComments(postId) {
 async function loadComments(postId) {
   const section = document.getElementById('comments-' + postId);
   if (!section) return;
-  section.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--faint)"><span class="spinner" style="color:var(--violet);width:14px;height:14px;margin-right:6px"></span>Loading...</div>`;
+  section.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--text-faint)"><span class="spinner" style="color:var(--accent);width:14px;height:14px;margin-right:6px"></span>Loading...</div>`;
 
   const { data, error } = await sb
     .from('comments')
@@ -439,7 +439,7 @@ async function loadComments(postId) {
     .eq('hidden', false)
     .order('created_at', { ascending: true });
 
-  if (error) { section.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--faint)">Could not load comments.</div>`; return; }
+  if (error) { section.innerHTML = `<div style="padding:12px;font-size:12px;color:var(--text-faint)">Could not load comments.</div>`; return; }
 
   // Fetch all replies for this post in one query
   const { data: replies } = await sb
@@ -522,9 +522,9 @@ function toggleCommentAnon(btnId) {
   if (!btn) return;
   const isOn = btn.dataset.anon === 'true';
   btn.dataset.anon    = isOn ? 'false' : 'true';
-  btn.style.background  = isOn ? '' : 'rgba(123,94,248,0.15)';
-  btn.style.borderColor = isOn ? '' : '#7b5ef8';
-  btn.style.color       = isOn ? '' : '#c4b5fd';
+  btn.style.background  = isOn ? '' : 'var(--accent-soft)';
+  btn.style.borderColor = isOn ? '' : 'var(--accent)';
+  btn.style.color       = isOn ? '' : 'var(--accent)';
 }
 
 function showReplyBox(postId, parentId) {
@@ -680,7 +680,7 @@ function renderClock() {
   if (!schedule) {
     pdName.textContent = dayName; pdTime.textContent = '--:--';
     pdLabel.textContent = 'No school today'; pdBar.style.width = '0%';
-    if (pdList) pdList.innerHTML = `<div style="padding:10px 8px;font-size:11px;color:var(--faint)">No schedule on weekends.</div>`;
+    if (pdList) pdList.innerHTML = `<div style="padding:10px 8px;font-size:11px;color:var(--text-faint)">No schedule on weekends.</div>`;
     return;
   }
 
@@ -696,14 +696,14 @@ function renderClock() {
     const durSec = eSec - toMin(current.start)*60;
     const pct = Math.min(100, Math.max(0, ((durSec - remSec)/durSec)*100));
     pdName.textContent = current.name; pdTime.textContent = fmtCountdown(Math.max(0,remSec));
-    pdLabel.textContent = 'remaining'; pdBar.style.width = pct.toFixed(1)+'%'; pdBar.style.background = '#1a3adb';
+    pdLabel.textContent = 'remaining'; pdBar.style.width = pct.toFixed(1)+'%'; pdBar.style.background = 'var(--accent)';
   } else if (next) {
     const remSec = toMin(next.start)*60 - totSec;
     pdName.textContent = 'Up next: '+next.name; pdTime.textContent = fmtCountdown(Math.max(0,remSec));
-    pdLabel.textContent = 'until start'; pdBar.style.width = '0%'; pdBar.style.background = '#7b5ef8';
+    pdLabel.textContent = 'until start'; pdBar.style.width = '0%'; pdBar.style.background = 'var(--accent-hover)';
   } else {
     pdName.textContent = dayName; pdTime.textContent = 'Done';
-    pdLabel.textContent = 'School day is over'; pdBar.style.width = '100%'; pdBar.style.background = '#7b5ef8';
+    pdLabel.textContent = 'School day is over'; pdBar.style.width = '100%'; pdBar.style.background = 'var(--accent-hover)';
   }
 
   const scheduleKey = now.getDay()+'-'+(schedule===SCHEDULE_WEDNESDAY?'wed':'std');
