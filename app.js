@@ -143,6 +143,9 @@ function enterHome() {
   loadPosts();
   loadLatestAnnouncement();
   subscribeRealtime();
+  if (window.SocialLayer && typeof window.SocialLayer.init === 'function') {
+    window.SocialLayer.init();
+  }
 }
 
 /* ════════════════════════════════════════════
@@ -304,6 +307,7 @@ async function loadPosts(filter) {
     return;
   }
   container.innerHTML = data.map(p => renderPostCard(p)).join('');
+  if (window.SocialLayer?.hydratePosts) window.SocialLayer.hydratePosts();
 }
 
 function renderPostCard(p) {
@@ -313,16 +317,20 @@ function renderPostCard(p) {
   const time      = timeAgo(p.created_at);
   const isSocial  = p.source === 'social';
   const commentCount = p.comment_count?.[0]?.count ?? 0;
-  return `<div class="post-card" id="post-${p.id}">
+  const ownerId = p.user_id || '';
+  const profileClick = (!isAnon && ownerId) ? `onclick="SocialLayer && SocialLayer.openProfileView('${ownerId}')" style="cursor:pointer"` : '';
+  return `<div class="post-card" id="post-${p.id}" data-post-id="${p.id}" data-user-id="${ownerId}">
+    <div class="post-owner-actions"></div>
     <div class="post-header">
-      <div class="avatar" style="${isSocial ? 'background:var(--violet)' : ''}">${initials}</div>
+      <div class="avatar" ${profileClick} style="${isSocial ? 'background:var(--violet);' : ''}${(!isAnon && ownerId) ? 'cursor:pointer;' : ''}">${initials}</div>
       <div class="post-meta">
-        <div class="post-name">${dispName}${isSocial ? ' <span style="font-size:10px;color:var(--violet);font-weight:500">· Social</span>' : ''}</div>
+        <div class="post-name" ${profileClick}>${dispName}${isSocial ? ' <span style="font-size:10px;color:var(--violet);font-weight:500">· Social</span>' : ''}</div>
         <div class="post-time">${time}</div>
       </div>
       <span class="post-tag ${p.tag || 'general'}">${p.tag || 'general'}</span>
     </div>
     <div class="post-body">${escHtml(p.content)}</div>
+    <div class="post-reactions"></div>
     <div class="post-actions">
       <button class="post-act-btn" onclick="toggleComments('${p.id}')">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -395,6 +403,7 @@ async function submitPost() {
   input.value = '';
   toast('Posted.', 'success');
   loadPosts();
+  if (window.SocialLayer?.hydratePosts) setTimeout(() => window.SocialLayer.hydratePosts(), 300);
 }
 
 /* ════════════════════════════════════════════
@@ -625,6 +634,7 @@ function prependPost(p) {
   const div = document.createElement('div');
   div.innerHTML = renderPostCard(p);
   container.prepend(div.firstElementChild);
+  if (window.SocialLayer?.hydratePosts) window.SocialLayer.hydratePosts();
 }
 
 /* ════════════════════════════════════════════

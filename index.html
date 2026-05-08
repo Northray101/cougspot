@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="social.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 /* ── Comments ── */
@@ -120,10 +121,25 @@
         </div>
       </div>
       <div class="nav-right">
+        <button class="soc-nav-btn theme-toggle" title="Toggle theme" onclick="SocialLayer.toggleTheme()">
+          <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
+        <button class="soc-nav-btn" title="Friends" onclick="SocialLayer.loadFriendsScreen()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="notif-dot" id="dot-friends"></span>
+        </button>
+        <button class="soc-nav-btn" title="Messages" onclick="SocialLayer.loadMessagesScreen()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="notif-dot" id="dot-messages"></span>
+        </button>
         <button class="nav-icon-btn" title="Admin" onclick="openAdminGate()">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </button>
-        <div class="avatar" id="nav-avatar">?</div>
+        <button id="nav-soc-avatar" class="soc-nav-btn" title="Profile" onclick="SocialLayer.openProfileView()" style="border:0;padding:0;width:auto;height:auto;background:transparent">
+          <div class="soc-avatar size-sm">?</div>
+        </button>
+        <div class="avatar" id="nav-avatar" style="display:none">?</div>
         <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="signOut()">Sign out</button>
       </div>
     </nav>
@@ -328,9 +344,112 @@
   </div>
 </div>
 
+<!-- ════ SOCIAL LAYER SCREENS ════ -->
+
+<!-- FRIENDS SCREEN -->
+<div id="screen-friends" class="screen soc-screen">
+  <nav class="nav">
+    <div class="nav-left">
+      <button class="soc-nav-btn" onclick="SocialLayer.backToHome()" title="Back">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="nav-wordmark" style="font-family:'Syne',sans-serif">Friends</span>
+    </div>
+  </nav>
+  <main style="max-width:680px;margin:0 auto;padding:24px 20px">
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 12px">Requests</h2>
+    <div id="friends-incoming" class="soc-list"></div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:28px 0 12px">Friends</h2>
+    <div id="friends-accepted" class="soc-list"></div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:28px 0 12px">Sent</h2>
+    <div id="friends-outgoing" class="soc-list"></div>
+  </main>
+</div>
+
+<!-- MESSAGES SCREEN -->
+<div id="screen-messages" class="screen soc-screen">
+  <nav class="nav">
+    <div class="nav-left">
+      <button class="soc-nav-btn" onclick="SocialLayer.backToHome()" title="Back">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="nav-wordmark" style="font-family:'Syne',sans-serif">Messages</span>
+    </div>
+  </nav>
+  <main style="max-width:680px;margin:0 auto;padding:24px 20px">
+    <div id="threads-list" class="soc-list"></div>
+  </main>
+</div>
+
+<!-- PROFILE VIEW SHEET -->
+<div id="modal-profile-view" class="soc-sheet-overlay">
+  <div class="soc-sheet" role="dialog" aria-modal="true" aria-labelledby="profile-view-title">
+    <div class="soc-sheet-grip"></div>
+    <div class="soc-sheet-head">
+      <span class="soc-sheet-title" id="profile-view-title">Profile</span>
+      <button class="soc-sheet-close" onclick="SocialLayer.closeSheet('profile-view')" aria-label="Close">×</button>
+    </div>
+    <div class="soc-sheet-body" id="profile-view-body"></div>
+  </div>
+</div>
+
+<!-- PROFILE EDITOR SHEET -->
+<div id="sheet-profile-editor" class="soc-sheet-overlay">
+  <div class="soc-sheet" role="dialog" aria-modal="true" aria-labelledby="pe-title">
+    <div class="soc-sheet-grip"></div>
+    <div class="soc-sheet-head">
+      <span class="soc-sheet-title" id="pe-title">Edit profile</span>
+      <button class="soc-sheet-close" onclick="SocialLayer.closeSheet('profile-editor')" aria-label="Close">×</button>
+    </div>
+    <div class="soc-sheet-body">
+      <div style="display:flex;justify-content:center;margin-bottom:16px"><span id="pe-avatar"></span></div>
+      <div class="soc-field">
+        <label>Avatar</label>
+        <div id="pe-emoji-grid" class="soc-emoji-grid"></div>
+      </div>
+      <div class="soc-field">
+        <label for="pe-display">Display name</label>
+        <input id="pe-display" class="soc-input" maxlength="40" placeholder="What people call you"/>
+      </div>
+      <div class="soc-field">
+        <label for="pe-bio">Bio</label>
+        <textarea id="pe-bio" class="soc-textarea" maxlength="160" rows="3" placeholder="Period 4 enjoyer · 11th grade · Norco football"></textarea>
+        <div class="soc-charcount" id="pe-charcount">0/160</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button class="soc-btn ghost" onclick="SocialLayer.closeSheet('profile-editor')">Cancel</button>
+        <button class="soc-btn primary" onclick="SocialLayer.saveProfile()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THREAD SHEET -->
+<div id="sheet-thread" class="soc-sheet-overlay">
+  <div class="soc-sheet" role="dialog" aria-modal="true">
+    <div class="soc-sheet-grip"></div>
+    <div class="soc-sheet-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="thread-avatar"></span>
+        <div>
+          <div class="soc-sheet-title" id="thread-title">Conversation</div>
+          <div style="font-size:12px;color:var(--muted)" id="thread-sub"></div>
+        </div>
+      </div>
+      <button class="soc-sheet-close" onclick="SocialLayer.closeSheet('thread')" aria-label="Close">×</button>
+    </div>
+    <div class="soc-sheet-body" id="thread-body" style="padding:0"></div>
+    <div class="thread-compose">
+      <input id="thread-input" class="soc-input" placeholder="Type a message…" onkeydown="SocialLayer.threadInputKey(event)"/>
+      <button class="soc-btn primary" onclick="SocialLayer.sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
 <script src="app.js"></script>
+<script src="social.js"></script>
 </body>
 </html>
