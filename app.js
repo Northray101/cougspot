@@ -5,7 +5,7 @@
 const SUPABASE_URL  = 'https://dqcyecscdelfikbimnpw.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxY3llY3NjZGVsZmlrYmltbnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzIwOTUsImV4cCI6MjA5Mzc0ODA5NX0.PIl0Syj--UQNjtMKNjAWmisYwOA50Aw5ICNv6J-UNDQ';
 const SITE_PIN      = '2345';   // required to create an account
-const ADMIN_PIN     = '7892';   // unlocks announcement tools
+const ADMIN_PIN     = '0316';   // unlocks announcement tools
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
