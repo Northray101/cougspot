@@ -320,7 +320,6 @@ function renderPostCard(p) {
   const ownerId = p.user_id || '';
   const profileClick = (!isAnon && ownerId) ? `onclick="SocialLayer && SocialLayer.openProfileView('${ownerId}')" style="cursor:pointer"` : '';
   return `<div class="post-card" id="post-${p.id}" data-post-id="${p.id}" data-user-id="${ownerId}">
-    <div class="post-owner-actions"></div>
     <div class="post-header">
       <div class="avatar" ${profileClick} style="${isSocial ? 'background:var(--violet);' : ''}${(!isAnon && ownerId) ? 'cursor:pointer;' : ''}">${initials}</div>
       <div class="post-meta">
@@ -336,6 +335,7 @@ function renderPostCard(p) {
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span id="cc-${p.id}">${commentCount}</span>
       </button>
+      <div class="post-owner-actions"></div>
     </div>
     <div class="comments-section" id="comments-${p.id}" style="display:none"></div>
   </div>`;

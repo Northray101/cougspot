@@ -490,7 +490,11 @@ function renderThread() {
     state.threadMessages.map(m => {
       const out = m.sender_id === me;
       const read = out && m.read_at ? '· read' : '';
-      return `<div class="bubble ${out?'out':'in'}">${escHtml(m.content)}<span class="meta">${timeAgo(m.created_at)} ${read}</span></div>`;
+      const isTemp = String(m.id||'').startsWith('temp-');
+      const delBtn = (out && !isTemp)
+        ? `<button class="bubble-del" title="Delete message" aria-label="Delete message" onclick="SocialLayer.deleteMessage('${m.id}')">&times;</button>`
+        : '';
+      return `<div class="bubble ${out?'out':'in'}" data-msg-id="${m.id}">${delBtn}${escHtml(m.content)}<span class="meta">${timeAgo(m.created_at)} ${read}</span></div>`;
     }).join('') + '</div>';
   // scroll to bottom
   const scroller = body.querySelector('.soc-thread');
@@ -524,6 +528,22 @@ async function sendMessage() {
 
 function threadInputKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+async function deleteMessage(id) {
+  const me = getUid(); if (!me || !id) return;
+  const idx = state.threadMessages.findIndex(m => m.id === id);
+  if (idx < 0) return;
+  const removed = state.threadMessages[idx];
+  // optimistic
+  state.threadMessages.splice(idx, 1);
+  renderThread();
+  const { error } = await sb.from('messages').delete().eq('id', id).eq('sender_id', me);
+  if (error) {
+    state.threadMessages.splice(idx, 0, removed);
+    renderThread();
+    window.toast && window.toast('Could not delete message.', 'error');
+  }
 }
 
 /* ── Reactions ───────────────────────────────── */
@@ -767,6 +787,7 @@ window.SocialLayer = {
   openThreadWith,
   sendMessage,
   threadInputKey,
+  deleteMessage,
   toggleReaction,
   togglePostMenu,
   requestDeletePost,
