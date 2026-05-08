@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Snake</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d0d; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #eee; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 12px; letter-spacing: 0.05em; color: #C15F3C; }
+  canvas { border: 2px solid #333; border-radius: 8px; display: block; }
+  #score { margin-top: 12px; font-size: 15px; color: #aaa; }
+  #msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85); border: 1px solid #444; border-radius: 10px;
+    padding: 24px 32px; text-align: center; font-size: 18px; display: none; }
+  #msg .sub { font-size: 13px; color: #888; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>SNAKE</h1>
+<div style="position:relative">
+  <canvas id="c" width="400" height="400"></canvas>
+  <div id="msg">
+    <div id="msg-title">Game Over</div>
+    <div class="sub">Press Space or tap to restart</div>
+  </div>
+</div>
+<div id="score">Score: 0</div>
+<script>
+const C = document.getElementById('c');
+const ctx = C.getContext('2d');
+const SZ = 20, COLS = 20, ROWS = 20;
+let snake, dir, nextDir, food, score, alive, loop;
+
+function init() {
+  snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir = {x:1,y:0}; nextDir = {x:1,y:0};
+  score = 0; alive = true;
+  document.getElementById('msg').style.display = 'none';
+  placeFood();
+  clearInterval(loop);
+  loop = setInterval(tick, 120);
+}
+
+function placeFood() {
+  do { food = {x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS)}; }
+  while (snake.some(s => s.x===food.x && s.y===food.y));
+}
+
+function tick() {
+  dir = nextDir;
+  const head = {x: snake[0].x+dir.x, y: snake[0].y+dir.y};
+  if (head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(s=>s.x===head.x&&s.y===head.y)) {
+    alive = false; clearInterval(loop);
+    document.getElementById('msg').style.display = 'block';
+    return;
+  }
+  snake.unshift(head);
+  if (head.x===food.x && head.y===food.y) { score++; document.getElementById('score').textContent='Score: '+score; placeFood(); }
+  else snake.pop();
+  draw();
+}
+
+function draw() {
+  ctx.fillStyle = '#0d0d0d'; ctx.fillRect(0,0,400,400);
+  ctx.fillStyle = '#2a2a2a';
+  for (let x=0;x<COLS;x++) for (let y=0;y<ROWS;y++) if((x+y)%2===0) ctx.fillRect(x*SZ,y*SZ,SZ,SZ);
+  snake.forEach((s,i) => {
+    ctx.fillStyle = i===0 ? '#C15F3C' : `hsl(${20+i*2},60%,${50-i*0.5}%)`;
+    ctx.beginPath(); ctx.roundRect(s.x*SZ+1,s.y*SZ+1,SZ-2,SZ-2,4); ctx.fill();
+  });
+  ctx.fillStyle = '#6fcf97';
+  ctx.beginPath(); ctx.arc(food.x*SZ+SZ/2,food.y*SZ+SZ/2,SZ/2-2,0,Math.PI*2); ctx.fill();
+}
+
+const DIRS = {ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},
+  w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0}};
+document.addEventListener('keydown', e => {
+  if (e.code==='Space') { if(!alive) init(); return; }
+  const d = DIRS[e.key];
+  if (d && !(d.x===-dir.x && d.y===-dir.y)) { e.preventDefault(); nextDir = d; }
+});
+
+// Touch support
+let tx=0,ty=0;
+C.addEventListener('touchstart', e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+C.addEventListener('touchend', e=>{
+  if(!alive){init();return;}
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)) nextDir=dx>0?{x:1,y:0}:{x:-1,y:0};
+  else nextDir=dy>0?{x:0,y:1}:{x:0,y:-1};
+},{passive:true});
+
+init(); draw();
+</script>
+</body>
+</html>

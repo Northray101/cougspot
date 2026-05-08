@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Emulator — CougSpot</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #000; overflow: hidden; }
+  #emulator { width: 100%; height: 100vh; }
+</style>
+</head>
+<body>
+<div id="emulator"></div>
+<script>
+  const p = new URLSearchParams(location.search);
+  EJS_player  = '#emulator';
+  EJS_core    = p.get('system') || 'nes';
+  EJS_gameUrl = p.get('rom')   || '';
+  EJS_color   = '#C15F3C';
+  EJS_startOnLoaded = true;
+</script>
+<script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+</body>
+</html>
