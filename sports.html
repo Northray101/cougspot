@@ -14,14 +14,13 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 11px;
-    color: var(--electric);
-    letter-spacing: 0.04em;
+    font-size: 12px;
+    color: var(--accent);
   }
   .live-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: var(--electric);
+    background: var(--accent);
     animation: pulse 2s ease-in-out infinite;
   }
   @keyframes pulse {
@@ -31,20 +30,20 @@
 
   /* Refresh button */
   .refresh-btn {
-    background: none;
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 5px 12px;
-    font-size: 12px;
-    color: var(--muted);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-muted);
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: color 0.15s, border-color 0.15s;
+    transition: color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
   }
-  .refresh-btn:hover { color: var(--text); border-color: var(--faint); }
+  .refresh-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface); }
   .refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
 
   /* Game row tweaks for live data */
@@ -59,9 +58,6 @@
 </head>
 <body>
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-
 <div id="app">
   <div class="screen active sports-page">
 
@@ -70,14 +66,14 @@
       <div class="nav-left">
         <div class="logo-icon" style="width:34px;height:34px;border-radius:9px;">
           <svg width="18" height="18" viewBox="0 0 44 44" fill="none">
-            <circle cx="22" cy="17" r="7" fill="#1a3adb"/>
-            <circle cx="22" cy="17" r="3" fill="#7b5ef8"/>
-            <path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#1a3adb" opacity=".8"/>
-            <circle cx="29" cy="12" r="3" fill="#7b5ef8" opacity=".9"/>
+            <circle cx="22" cy="17" r="7" fill="#C15F3C"/>
+            <circle cx="22" cy="17" r="3" fill="#A84F2E"/>
+            <path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#C15F3C" opacity=".8"/>
+            <circle cx="29" cy="12" r="3" fill="#A84F2E" opacity=".9"/>
           </svg>
         </div>
         <span class="nav-wordmark">
-          <span style="color:var(--text)">Coug</span><span style="color:var(--violet)">Spot</span>
+          <span style="color:var(--text)">Coug</span><span style="color:var(--accent)">Spot</span>
         </span>
         <div class="nav-links">
           <a class="nav-link" href="index.html">
@@ -114,7 +110,7 @@
           <div class="page-subtitle">
             Norco High School &mdash; Big VIII League &mdash;
             <a href="https://www.maxpreps.com/ca/norco/norco-cougars/" target="_blank"
-               style="color:var(--violet);text-decoration:none">MaxPreps ↗</a>
+               style="color:var(--accent);text-decoration:none">MaxPreps ↗</a>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
@@ -136,8 +132,8 @@
       <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
         <button class="tag-btn" id="filter-all"
           onclick="filterSports('all')"
-          style="background:rgba(26,58,219,0.1);border-color:#1a3adb;color:#93aeff">
-          All Sports
+          style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent)">
+          All sports
         </button>
         <button class="tag-btn" id="filter-fall"   onclick="filterSports('fall')"  >Fall</button>
         <button class="tag-btn" id="filter-winter" onclick="filterSports('winter')">Winter</button>
@@ -146,14 +142,14 @@
 
       <!-- Sports Grid — populated by sports.js -->
       <div class="sports-grid" id="sports-grid">
-        <div style="padding:48px;text-align:center;color:var(--faint)">
-          <div class="spinner" style="color:var(--violet);margin:0 auto 12px;width:24px;height:24px;border-width:2.5px"></div>
-          <p style="font-size:13px;font-weight:300">Loading schedules from MaxPreps...</p>
+        <div style="padding:48px;text-align:center;color:var(--text-faint)">
+          <div class="spinner" style="color:var(--accent);margin:0 auto 12px;width:24px;height:24px;border-width:2.5px"></div>
+          <p style="font-size:14px">Loading schedules from MaxPreps…</p>
         </div>
       </div>
 
       <!-- Last updated -->
-      <div id="last-updated" style="text-align:center;font-size:11px;color:var(--faint);margin-top:24px;font-weight:300"></div>
+      <div id="last-updated" style="text-align:center;font-size:12px;color:var(--text-faint);margin-top:24px"></div>
 
     </div>
   </div>
