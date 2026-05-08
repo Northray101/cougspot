@@ -319,6 +319,55 @@ async function handleFriendAction(otherId, btn) {
   refreshNotifications();
 }
 
+/* ── User search ─────────────────────────────── */
+let _searchSeq = 0;
+async function searchUsers(q, mode) {
+  const seq = ++_searchSeq;
+  const me = getUid();
+  const target = mode === 'message' ? '#message-search-results' : '#friend-search-results';
+  const el = $(target);
+  if (!el) return;
+  const term = (q||'').trim();
+  if (!term) { el.innerHTML = ''; return; }
+  el.innerHTML = skeletonRows(2);
+  const like = '%' + term.replace(/[%_]/g,'') + '%';
+  const { data } = await sb.from('profiles')
+    .select('id, username, display_name, avatar_emoji, bio')
+    .or(`username.ilike.${like},display_name.ilike.${like}`)
+    .limit(20);
+  if (seq !== _searchSeq) return; // stale response
+  const rows = (data||[]).filter(p => p.id !== me);
+  if (!rows.length) {
+    el.innerHTML = `<div class="soc-empty" style="padding:18px"><p>No users matched "${escHtml(term)}".</p></div>`;
+    return;
+  }
+  rows.forEach(p => { state.profilesCache[p.id] = p; });
+  // Look up existing friendship state for each result
+  const ids = rows.map(r => r.id);
+  const { data: edges } = await sb.from('friendships').select('*')
+    .or(`requester_id.in.(${ids.join(',')}),addressee_id.in.(${ids.join(',')})`);
+  const edgeFor = (otherId) => (edges||[]).find(e =>
+    (e.requester_id === me && e.addressee_id === otherId) ||
+    (e.requester_id === otherId && e.addressee_id === me)
+  );
+  el.innerHTML = rows.map(p => {
+    const e = edgeFor(p.id);
+    let s = 'idle';
+    if (e) {
+      if (e.status === 'accepted') s = 'accepted';
+      else if (e.status === 'pending') s = e.requester_id === me ? 'pending' : 'incoming';
+    }
+    const action = mode === 'message'
+      ? `<button class="soc-btn primary" style="height:34px;min-width:90px" onclick="event.stopPropagation();SocialLayer.openThreadWith('${p.id}')">Message</button>`
+      : `<button class="soc-btn ${s==='idle'?'primary':'ghost'} soc-friend-btn" data-state="${s}" data-target="${p.id}" style="height:34px;min-width:110px" onclick="event.stopPropagation();SocialLayer.handleFriendAction('${p.id}', this)">${friendLabel(s)}</button>`;
+    return `<div class="soc-row" onclick="SocialLayer.openProfileView('${p.id}')">
+      ${avatarHTML(p,'sm')}
+      <div class="grow"><div class="name">${escHtml(p.display_name||p.username)}</div><div class="sub">@${escHtml(p.username)}${p.bio?' · '+escHtml(p.bio.slice(0,60)):''}</div></div>
+      <div class="actions">${action}</div>
+    </div>`;
+  }).join('');
+}
+
 async function declineFriend(otherId) {
   const me = getUid(); if (!me) return;
   await sb.from('friendships').update({ status: 'declined', responded_at: new Date().toISOString() })
@@ -330,6 +379,8 @@ async function declineFriend(otherId) {
 async function loadFriendsScreen() {
   const me = getUid(); if (!me) return;
   showSocScreen('friends');
+  const si = $('#friend-search-input'); if (si) si.value = '';
+  const sr = $('#friend-search-results'); if (sr) sr.innerHTML = '';
   const incomingEl = $('#friends-incoming');
   const acceptedEl = $('#friends-accepted');
   const outgoingEl = $('#friends-outgoing');
@@ -403,6 +454,8 @@ async function cancelFriendRequest(addresseeId) {
 async function loadMessagesScreen() {
   const me = getUid(); if (!me) return;
   showSocScreen('messages');
+  const si = $('#message-search-input'); if (si) si.value = '';
+  const sr = $('#message-search-results'); if (sr) sr.innerHTML = '';
   const list = $('#threads-list');
   list.innerHTML = skeletonRows(4);
 
@@ -784,6 +837,7 @@ window.SocialLayer = {
   cancelFriendRequest,
   loadFriendsScreen,
   loadMessagesScreen,
+  searchUsers,
   openThreadWith,
   sendMessage,
   threadInputKey,

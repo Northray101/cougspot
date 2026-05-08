@@ -357,7 +357,12 @@
     </div>
   </nav>
   <main style="max-width:680px;margin:0 auto;padding:24px 20px">
-    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 12px">Requests</h2>
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 12px">Find people</h2>
+    <div class="soc-search-row">
+      <input type="search" id="friend-search-input" class="soc-search-input" placeholder="Search by username..." oninput="SocialLayer.searchUsers(this.value, 'friend')" autocomplete="off"/>
+    </div>
+    <div id="friend-search-results" class="soc-list" style="margin-top:8px"></div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:28px 0 12px">Requests</h2>
     <div id="friends-incoming" class="soc-list"></div>
     <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:28px 0 12px">Friends</h2>
     <div id="friends-accepted" class="soc-list"></div>
@@ -377,6 +382,12 @@
     </div>
   </nav>
   <main style="max-width:680px;margin:0 auto;padding:24px 20px">
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 12px">New message</h2>
+    <div class="soc-search-row">
+      <input type="search" id="message-search-input" class="soc-search-input" placeholder="Search to message someone..." oninput="SocialLayer.searchUsers(this.value, 'message')" autocomplete="off"/>
+    </div>
+    <div id="message-search-results" class="soc-list" style="margin-top:8px"></div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:28px 0 12px">Conversations</h2>
     <div id="threads-list" class="soc-list"></div>
   </main>
 </div>

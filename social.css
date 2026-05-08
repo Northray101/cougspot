@@ -493,6 +493,24 @@
 }
 .bubble .meta { display: block; font-size: 10px; opacity: 0.7; margin-top: 3px; }
 .bubble.out .meta { text-align: right; }
+.soc-search-row { display: flex; gap: 8px; }
+.soc-search-input {
+  flex: 1; height: 44px;
+  background: var(--surface, var(--soc-surface));
+  border: 1px solid color-mix(in oklch, currentColor 14%, transparent);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  color: var(--text, var(--soc-text));
+  font-family: 'DM Sans', sans-serif; font-size: var(--text-base, 16px);
+  outline: none;
+  transition: border-color 160ms var(--ease-golden), box-shadow 160ms var(--ease-golden);
+}
+.soc-search-input:focus-visible {
+  border-color: var(--soc-accent, #2e6fff);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--soc-accent, #2e6fff) 20%, transparent);
+}
+.soc-search-input::placeholder { color: var(--muted, var(--soc-muted)); }
+
 .bubble.out { position: relative; }
 .bubble-del {
   position: absolute; top: -8px; left: -8px;
