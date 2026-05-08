@@ -1,0 +1,45 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- NES Tetris dark background -->
+  <rect width="200" height="140" fill="#000"/>
+  <!-- Left panel -->
+  <rect x="5" y="5" width="85" height="130" rx="1" fill="#0000AA"/>
+  <!-- Right stats panel -->
+  <rect x="100" y="5" width="95" height="130" rx="1" fill="#0000AA"/>
+  <!-- Playing field -->
+  <rect x="10" y="10" width="75" height="110" rx="1" fill="#000"/>
+  <!-- Blocks -->
+  <!-- I piece (light blue) -->
+  <rect x="12" y="82" width="14" height="14" fill="#00FFFF" rx="1"/>
+  <rect x="28" y="82" width="14" height="14" fill="#00FFFF" rx="1"/>
+  <rect x="44" y="82" width="14" height="14" fill="#00FFFF" rx="1"/>
+  <rect x="60" y="82" width="14" height="14" fill="#00FFFF" rx="1"/>
+  <!-- L piece (orange) -->
+  <rect x="12" y="98" width="14" height="14" fill="#FF7700" rx="1"/>
+  <rect x="12" y="82" width="14" height="14" fill="#FF7700" rx="1" opacity="0"/>
+  <rect x="28" y="98" width="14" height="14" fill="#FF7700" rx="1"/>
+  <rect x="44" y="98" width="14" height="14" fill="#FF7700" rx="1"/>
+  <rect x="44" y="84" width="14" height="12" fill="#FF7700" rx="1"/>
+  <!-- S piece (green) -->
+  <rect x="28" y="68" width="14" height="12" fill="#00AA00" rx="1"/>
+  <rect x="44" y="68" width="14" height="12" fill="#00AA00" rx="1"/>
+  <rect x="12" y="82" width="14" height="12" fill="#00AA00" rx="1"/>
+  <rect x="28" y="82" width="14" height="12" fill="#00AA00" rx="1"/>
+  <!-- bottom rows fill -->
+  <rect x="12" y="112" width="72" height="6" fill="#AA0000" rx="1" opacity="0.8"/>
+  <!-- Falling T piece -->
+  <rect x="28" y="30" width="14" height="12" fill="#AA00AA" rx="1"/>
+  <rect x="44" y="30" width="14" height="12" fill="#AA00AA" rx="1"/>
+  <rect x="60" y="30" width="14" height="12" fill="#AA00AA" rx="1"/>
+  <rect x="44" y="44" width="14" height="12" fill="#AA00AA" rx="1"/>
+  <!-- Stats -->
+  <text x="148" y="28"  font-family="monospace" font-size="9"  fill="#fff" text-anchor="middle">LINES</text>
+  <text x="148" y="40"  font-family="monospace" font-size="11" fill="#FFFF00" text-anchor="middle" font-weight="bold">036</text>
+  <text x="148" y="60"  font-family="monospace" font-size="9"  fill="#fff" text-anchor="middle">TOP</text>
+  <text x="148" y="72"  font-family="monospace" font-size="11" fill="#FFFF00" text-anchor="middle" font-weight="bold">15120</text>
+  <text x="148" y="92"  font-family="monospace" font-size="9"  fill="#fff" text-anchor="middle">SCORE</text>
+  <text x="148" y="104" font-family="monospace" font-size="11" fill="#FFFF00" text-anchor="middle" font-weight="bold">18200</text>
+  <text x="148" y="118" font-family="monospace" font-size="9"  fill="#fff" text-anchor="middle">LEVEL</text>
+  <text x="148" y="130" font-family="monospace" font-size="13" fill="#FFFF00" text-anchor="middle" font-weight="bold">05</text>
+  <!-- label -->
+  <text x="50" y="135" font-family="monospace" font-size="9" fill="#00FFFF" text-anchor="middle" letter-spacing="1">NES TETRIS</text>
+</svg>

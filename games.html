@@ -69,7 +69,16 @@
     font-size: 52px;
     border-bottom: 1px solid var(--border);
     transition: transform 250ms var(--ease);
+    overflow: hidden;
   }
+  .game-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 250ms var(--ease);
+  }
+  .game-thumb .thumb-icon { font-size: 52px; line-height: 1; }
+  .game-card:hover .game-thumb img,
   .game-card:hover .game-thumb { transform: scale(1.06); }
 
   .game-info { padding: 14px; display: flex; flex-direction: column; gap: 6px; }

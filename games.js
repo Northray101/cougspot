@@ -10,15 +10,41 @@ let currentUser = null;
 let currentFilter = 'all';
 let playCounts = {};
 
+const ROM = (file, system) =>
+  `games/emulator.html?system=${system}&rom=${encodeURIComponent('games/roms/' + file)}`;
+
 const GAMES = [
-  { id: '2048',    name: '2048',        category: 'html5',  addedAt: '2026-05-08', src: 'games/2048/index.html',   icon: '🔢', desc: 'Slide tiles, reach 2048.' },
-  { id: 'snake',   name: 'Snake',       category: 'html5',  addedAt: '2026-05-08', src: 'games/snake/index.html',  icon: '🐍', desc: 'Eat apples, grow, survive.' },
-  { id: 'tetris',  name: 'Tetris',      category: 'html5',  addedAt: '2026-05-08', src: 'games/tetris/index.html', icon: '🧱', desc: 'Stack blocks, clear lines.' },
-  { id: 'flappy',  name: 'Flappy Bird', category: 'html5',  addedAt: '2026-05-08', src: 'games/flappy/index.html', icon: '🐦', desc: 'Tap to fly through pipes.' },
-  { id: 'wordle',  name: 'Wordle',      category: 'puzzle', addedAt: '2026-05-08', src: 'games/wordle/index.html', icon: '🟩', desc: 'Guess the 5-letter word.' },
-  { id: 'sudoku',  name: 'Sudoku',      category: 'puzzle', addedAt: '2026-05-08', src: 'games/sudoku/index.html', icon: '🔣', desc: 'Fill the 9×9 grid.' },
-  { id: 'nes-placeholder', name: 'NES — Coming Soon', category: 'retro', addedAt: '2026-05-08', src: null, icon: '🕹️', desc: 'Drop an NES ROM into games/roms/ and add it to GAMES.' },
-  { id: 'snes-placeholder', name: 'SNES — Coming Soon', category: 'retro', addedAt: '2026-05-08', src: null, icon: '🎮', desc: 'Drop a SNES ROM into games/roms/ and add it to GAMES.' },
+  // ── HTML5 Classics ──────────────────────────────────────────────────────
+  { id: '2048',   name: '2048',        category: 'html5',  addedAt: '2026-05-08',
+    src: 'games/2048/index.html',   thumb: 'games/thumbs/2048.svg',      icon: '🔢', desc: 'Slide tiles to reach 2048.' },
+  { id: 'snake',  name: 'Snake',       category: 'html5',  addedAt: '2026-05-08',
+    src: 'games/snake/index.html',  thumb: 'games/thumbs/snake.svg',     icon: '🐍', desc: 'Eat apples, grow, survive.' },
+  { id: 'tetris', name: 'Tetris',      category: 'html5',  addedAt: '2026-05-08',
+    src: 'games/tetris/index.html', thumb: 'games/thumbs/tetris.svg',    icon: '🧱', desc: 'Stack blocks, clear lines.' },
+  { id: 'flappy', name: 'Flappy Bird', category: 'html5',  addedAt: '2026-05-08',
+    src: 'games/flappy/index.html', thumb: 'games/thumbs/flappy.svg',    icon: '🐦', desc: 'Tap to fly through pipes.' },
+  // ── Puzzle / Word ────────────────────────────────────────────────────────
+  { id: 'wordle', name: 'Wordle',      category: 'puzzle', addedAt: '2026-05-08',
+    src: 'games/wordle/index.html', thumb: 'games/thumbs/wordle.svg',    icon: '🟩', desc: 'Guess the 5-letter word in 6 tries.' },
+  { id: 'sudoku', name: 'Sudoku',      category: 'puzzle', addedAt: '2026-05-08',
+    src: 'games/sudoku/index.html', thumb: 'games/thumbs/sudoku.svg',    icon: '🔣', desc: 'Fill the 9×9 grid.' },
+  // ── Retro — NES ──────────────────────────────────────────────────────────
+  { id: 'mario-bros', name: 'Super Mario Bros.', category: 'retro', addedAt: '2026-05-08',
+    src: ROM('Super Mario Bros. (World).nes', 'nes'),
+    thumb: 'games/thumbs/mario-bros.svg', icon: '🍄', desc: 'The original NES classic — save Princess Peach.' },
+  { id: 'tetris-nes', name: 'Tetris (NES)',       category: 'retro', addedAt: '2026-05-08',
+    src: ROM('Tetris (USA).nes', 'nes'),
+    thumb: 'games/thumbs/tetris-nes.svg', icon: '🟦', desc: 'The legendary NES version with Russian soundtrack.' },
+  // ── Retro — SNES ─────────────────────────────────────────────────────────
+  { id: 'mario-world', name: 'Super Mario World',       category: 'retro', addedAt: '2026-05-08',
+    src: ROM('Super Mario World (USA).sfc', 'snes'),
+    thumb: 'games/thumbs/mario-world.svg', icon: '🦕', desc: 'Explore Dinosaur Land with Mario and Yoshi.' },
+  { id: 'zelda-lttp',  name: 'Zelda: A Link to the Past', category: 'retro', addedAt: '2026-05-08',
+    src: ROM('Legend of Zelda, The - A Link to the Past (USA).sfc', 'snes'),
+    thumb: 'games/thumbs/zelda-lttp.svg', icon: '🗡️', desc: 'Link battles Ganon across Hyrule and the Dark World.' },
+  { id: 'megaman-x',   name: 'Mega Man X',               category: 'retro', addedAt: '2026-05-08',
+    src: ROM('Mega Man X (USA) (Rev 1).sfc', 'snes'),
+    thumb: 'games/thumbs/megaman-x.svg',  icon: '🤖', desc: 'Run, jump, and blast as X in a cyber future.' },
 ];
 
 window.addEventListener('load', async () => {
@@ -88,13 +114,18 @@ function gameCard(game, delay) {
   const plays = playCounts[game.id] || 0;
   const playLabel = plays === 0 ? 'No plays yet' : (plays === 1 ? '1 play this week' : `${plays} plays this week`);
   const dimmed = !game.src ? ' style-dimmed' : '';
+  const thumbHtml = game.thumb
+    ? `<img src="${escHtml(game.thumb)}" alt="${escHtml(game.name)}" loading="lazy"
+            onerror="this.parentElement.innerHTML='<span class=\\'thumb-icon\\'>${game.icon}</span>'">`
+    : `<span class="thumb-icon">${game.icon}</span>`;
+  const categoryLabel = { html5: 'HTML5', retro: 'Retro', puzzle: 'Puzzle' }[game.category] || game.category;
   return `
     <div class="game-card${dimmed}" onclick="openGame('${game.id}')" style="animation: fadeUp 400ms var(--ease) ${delay}ms both">
-      <div class="game-thumb">${game.icon}</div>
+      <div class="game-thumb">${thumbHtml}</div>
       <div class="game-info">
         <div class="game-name-row">
           <span class="game-name">${escHtml(game.name)}</span>
-          <span class="game-badge game-badge-${game.category}">${game.category}</span>
+          <span class="game-badge game-badge-${game.category}">${categoryLabel}</span>
         </div>
         <div class="game-desc">${escHtml(game.desc)}</div>
         <div class="game-plays">${playLabel}</div>

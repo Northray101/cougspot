@@ -1,0 +1,34 @@
+<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- NES-style background: black sky -->
+  <rect width="200" height="140" fill="#000"/>
+  <!-- Underground bricks -->
+  <rect x="0" y="100" width="200" height="40" fill="#8B3A1B"/>
+  <g fill="#6B2A10">
+    <rect x="0"  y="100" width="48" height="2"/><rect x="50"  y="100" width="48" height="2"/>
+    <rect x="100" y="100" width="48" height="2"/><rect x="150" y="100" width="48" height="2"/>
+    <rect x="24" y="118" width="48" height="2"/><rect x="74"  y="118" width="48" height="2"/>
+    <rect x="124" y="118" width="48" height="2"/>
+  </g>
+  <!-- Question blocks -->
+  <rect x="60"  y="50" width="24" height="24" rx="2" fill="#B8860B"/>
+  <text x="72" y="67" font-family="monospace" font-size="14" font-weight="bold" fill="#FFD700" text-anchor="middle">?</text>
+  <rect x="90"  y="50" width="24" height="24" rx="2" fill="#B8860B"/>
+  <text x="102" y="67" font-family="monospace" font-size="14" font-weight="bold" fill="#FFD700" text-anchor="middle">?</text>
+  <rect x="120" y="50" width="24" height="24" rx="2" fill="#DAA520"/>
+  <text x="132" y="67" font-family="monospace" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">!</text>
+  <!-- Mario (pixel-art simplified) -->
+  <!-- Hat -->
+  <rect x="22" y="58" width="20" height="6"  fill="#CC0000"/>
+  <rect x="20" y="64" width="24" height="6"  fill="#CC0000"/>
+  <!-- Face -->
+  <rect x="20" y="70" width="24" height="10" fill="#FFCC99"/>
+  <rect x="24" y="72" width="4"  height="4"  fill="#333"/>
+  <rect x="34" y="72" width="4"  height="4"  fill="#333"/>
+  <!-- Overall -->
+  <rect x="18" y="80" width="28" height="10" fill="#004FC4"/>
+  <!-- Legs -->
+  <rect x="18" y="90" width="12" height="8"  fill="#CC0000"/>
+  <rect x="34" y="90" width="12" height="8"  fill="#CC0000"/>
+  <!-- label -->
+  <text x="100" y="135" font-family="monospace" font-size="11" font-weight="bold" fill="#FFD700" text-anchor="middle" letter-spacing="1">SUPER MARIO BROS.</text>
+</svg>
