@@ -201,7 +201,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease), opacity 160ms var(--ease);
+  transition: background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease), opacity 150ms var(--ease);
   border: 1px solid transparent;
   text-decoration: none;
   line-height: 1;
@@ -302,7 +302,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   outline: none;
-  transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease);
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
   width: 100%;
 }
 .field input:focus {
@@ -376,7 +376,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   border-radius: 50%;
   border: 1.5px solid var(--border-strong);
   background: transparent;
-  transition: background 160ms var(--ease), border-color 160ms var(--ease);
+  transition: background 150ms var(--ease), border-color 150ms var(--ease);
 }
 .pin-dot.filled {
   background: var(--accent);
@@ -399,7 +399,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-weight: 500;
   color: var(--text);
   cursor: pointer;
-  transition: background 160ms var(--ease), border-color 160ms var(--ease);
+  transition: background 150ms var(--ease), border-color 150ms var(--ease);
   text-align: center;
 }
 .pin-key:hover  { background: var(--surface); border-color: var(--border-strong); }
@@ -482,7 +482,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-size: 14px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 160ms var(--ease), color 160ms var(--ease);
+  transition: background 150ms var(--ease), color 150ms var(--ease);
   border: none;
   background: none;
   font-family: 'Inter', sans-serif;
@@ -524,7 +524,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   color: var(--text-muted);
   cursor: pointer;
   font-size: 16px;
-  transition: color 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
 }
 .nav-icon-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border-strong); }
 
@@ -538,10 +538,10 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
 
 .home-body {
   display: grid;
-  grid-template-columns: 220px 1fr 300px;
+  grid-template-columns: 1fr 300px;
   gap: 0;
   flex: 1;
-  max-width: 1240px;
+  max-width: 1060px;
   margin: 0 auto;
   width: 100%;
   padding: 0 24px;
@@ -572,7 +572,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-size: 14px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 160ms var(--ease), color 160ms var(--ease);
+  transition: background 150ms var(--ease), color 150ms var(--ease);
   border: none;
   background: none;
   text-align: left;
@@ -613,7 +613,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   border-radius: 12px;
   padding: 18px;
   margin-bottom: 24px;
-  transition: border-color 160ms var(--ease);
+  transition: border-color 150ms var(--ease);
 }
 .compose-box:focus-within { border-color: var(--accent); }
 
@@ -660,7 +660,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   font-size: 13px;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
-  transition: color 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), background 150ms var(--ease);
 }
 .tag-btn:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface); }
 .tag-btn.active {
@@ -721,7 +721,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   padding: 0;
-  transition: color 160ms var(--ease);
+  transition: color 150ms var(--ease);
 }
 .post-act-btn:hover { color: var(--accent); }
 
@@ -810,7 +810,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   padding: 7px 8px;
   border-radius: 6px;
   font-size: 13px;
-  transition: background 160ms var(--ease);
+  transition: background 150ms var(--ease);
 }
 .period-row.current { background: var(--accent-soft); }
 .period-row.current .pr-name { color: var(--accent); font-weight: 500; }
@@ -870,7 +870,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   resize: none;
   min-height: 72px;
   outline: none;
-  transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease);
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
   line-height: 1.5;
 }
 .announce-textarea:focus {
@@ -954,7 +954,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 160ms var(--ease);
+  transition: border-color 150ms var(--ease);
 }
 .sport-card:hover {
   border-color: var(--border-strong);
@@ -1071,7 +1071,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
 ══════════════════════════════════ */
 @media (max-width: 900px) {
   .home-body { grid-template-columns: 1fr; }
-  .sidebar, .right-panel { display: none; }
+  .right-panel { display: none; }
 }
 @media (max-width: 600px) {
   .landing-hero { font-size: 36px; }

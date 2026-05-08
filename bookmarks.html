@@ -11,31 +11,37 @@
 <style>
   .bookmarks-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
-    margin-top: 8px;
+    margin-bottom: 40px;
   }
+
   .bookmark-card {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 18px;
+    gap: 16px;
+    padding: 20px;
     background: var(--surface-raised);
     border: 1px solid var(--border);
     border-radius: 12px;
     text-decoration: none;
     color: var(--text);
-    transition: border-color 150ms var(--ease), background 150ms var(--ease), transform 150ms var(--ease);
+    transition: border-color 150ms var(--ease), transform 250ms var(--ease), box-shadow 250ms var(--ease);
+    cursor: pointer;
   }
   .bookmark-card:hover {
     border-color: var(--accent);
-    background: var(--surface);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.12);
   }
+  [data-theme="dark"] .bookmark-card:hover {
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4);
+  }
+
   .bookmark-favicon {
-    width: 40px; height: 40px;
+    width: 42px; height: 42px;
     flex-shrink: 0;
-    border-radius: 9px;
+    border-radius: 10px;
     background: var(--surface);
     border: 1px solid var(--border);
     display: flex;
@@ -44,46 +50,55 @@
     overflow: hidden;
   }
   .bookmark-favicon img {
-    width: 24px; height: 24px;
+    width: 26px; height: 26px;
     display: block;
   }
+
   .bookmark-body { flex: 1; min-width: 0; }
+
   .bookmark-name {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 15px;
     color: var(--text);
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
     gap: 6px;
   }
-  .bookmark-name .arrow {
+  .bookmark-name .bm-arrow {
     color: var(--text-faint);
-    transition: color 150ms var(--ease), transform 150ms var(--ease);
+    transition: color 150ms var(--ease), transform 200ms var(--ease);
+    flex-shrink: 0;
   }
-  .bookmark-card:hover .arrow {
+  .bookmark-card:hover .bm-arrow {
     color: var(--accent);
     transform: translate(2px, -2px);
   }
+
   .bookmark-desc {
     font-size: 13px;
     color: var(--text-muted);
-    line-height: 1.45;
+    line-height: 1.5;
     font-weight: 400;
+    margin-bottom: 6px;
   }
   .bookmark-host {
     font-size: 11px;
     color: var(--text-faint);
-    margin-top: 6px;
     font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 600px) {
+    .bookmarks-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <div class="screen active">
+  <div class="screen active sports-page">
 
     <!-- NAV -->
     <nav class="nav">
@@ -126,7 +141,7 @@
       <div class="section-head">
         <div>
           <div class="page-title">Bookmarks</div>
-          <div class="page-subtitle">Quick links to popular AI tools and study sites</div>
+          <div class="page-subtitle">Quick links to AI tools and study resources</div>
         </div>
       </div>
 
@@ -144,22 +159,52 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 const BOOKMARKS = [
-  { name: 'Cloak',   host: 'chat.usecloak.org',  url: 'https://chat.usecloak.org',   desc: 'Private AI chat that keeps your conversations encrypted.' },
-  { name: 'ChatGPT', host: 'chat.openai.com',    url: 'https://chat.openai.com',     desc: 'OpenAI’s general-purpose chatbot for writing, code, and ideas.' },
-  { name: 'Claude',  host: 'claude.ai',          url: 'https://claude.ai',           desc: 'Anthropic’s assistant — strong at long docs and careful reasoning.' },
-  { name: 'Gemini',  host: 'gemini.google.com',  url: 'https://gemini.google.com',   desc: 'Google’s multimodal AI with deep search integration.' },
-  { name: 'Gauth',   host: 'gauthmath.com',      url: 'https://gauthmath.com',       desc: 'Step-by-step homework helper for math and science problems.' },
+  {
+    name: 'Cloak',
+    host: 'chat.usecloak.org',
+    url:  'https://chat.usecloak.org',
+    desc: 'Private AI chat that keeps your conversations encrypted and safe.',
+  },
+  {
+    name: 'ChatGPT',
+    host: 'chat.openai.com',
+    url:  'https://chat.openai.com',
+    desc: "OpenAI's general-purpose assistant for writing, code, and research.",
+  },
+  {
+    name: 'Claude',
+    host: 'claude.ai',
+    url:  'https://claude.ai',
+    desc: "Anthropic's assistant — strong at long documents and careful reasoning.",
+  },
+  {
+    name: 'Gemini',
+    host: 'gemini.google.com',
+    url:  'https://gemini.google.com',
+    desc: "Google's multimodal AI with deep search and Workspace integration.",
+  },
+  {
+    name: 'Gauth',
+    host: 'gauthmath.com',
+    url:  'https://gauthmath.com',
+    desc: 'Step-by-step homework helper for math and science problems.',
+  },
 ];
 
 function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function renderBookmarks() {
   const grid = document.getElementById('bookmarks-grid');
   grid.innerHTML = BOOKMARKS.map((b, i) => `
-    <a class="bookmark-card" href="${escHtml(b.url)}" target="_blank" rel="noopener noreferrer"
-       style="animation: fadeUp 250ms var(--ease) ${i * 40}ms both">
+    <a class="bookmark-card"
+       href="${escHtml(b.url)}"
+       target="_blank"
+       rel="noopener noreferrer"
+       style="animation: fadeUp 400ms var(--ease) ${i * 60}ms both">
       <div class="bookmark-favicon">
         <img src="https://www.google.com/s2/favicons?domain=${escHtml(b.host)}&sz=64"
              alt="" loading="lazy"
@@ -168,7 +213,9 @@ function renderBookmarks() {
       <div class="bookmark-body">
         <div class="bookmark-name">
           ${escHtml(b.name)}
-          <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l10-10"/><path d="M7 7h10v10"/></svg>
+          <svg class="bm-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17l10-10"/><path d="M7 7h10v10"/>
+          </svg>
         </div>
         <div class="bookmark-desc">${escHtml(b.desc)}</div>
         <div class="bookmark-host">${escHtml(b.host)}</div>
@@ -179,9 +226,11 @@ function renderBookmarks() {
 window.addEventListener('load', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
+
   const username = session.user.user_metadata?.username || '?';
   const el = document.getElementById('nav-avatar-bookmarks');
   if (el) el.textContent = username.slice(0, 2).toUpperCase();
+
   renderBookmarks();
 });
 
