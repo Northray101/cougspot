@@ -341,7 +341,7 @@ async function sendChatMessage() {
       body: JSON.stringify({
         model: CLOAK_MODEL,
         message: content,
-        chat_history: chatHistory.slice(0, -1),
+        chat_history: chatHistory.slice(0, -1), // all but last (the one we just sent)
         system_prompt: CLOAK_SYSTEM,
         temperature: 0.7,
       }),
