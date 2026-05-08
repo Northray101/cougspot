@@ -16,7 +16,7 @@
 .comment {
   padding: 12px 0 8px 0;
   border-top: 1px solid var(--border);
-  animation: fadeUp 0.25s ease both;
+  animation: fadeUp 250ms var(--ease) both;
 }
 .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .comment-body { font-size: 14px; color: var(--text); font-weight: 400; line-height: 1.6; padding-left: 34px; }
@@ -29,7 +29,7 @@
   width: 100%; background: var(--surface-raised); border: 1px solid var(--border);
   border-radius: 8px; padding: 9px 12px; color: var(--text);
   font-family: 'Inter', sans-serif; font-size: 14px;
-  resize: none; outline: none; transition: border-color 0.15s; line-height: 1.5;
+  resize: none; outline: none; transition: border-color 150ms var(--ease); line-height: 1.5;
 }
 .comment-textarea:focus { border-color: var(--accent); }
 .comment-textarea::placeholder { color: var(--text-faint); }
@@ -41,7 +41,7 @@
 /* ── Clock collapsible ── */
 .clock-collapse-btn {
   background: none; border: none; color: var(--text-muted); cursor: pointer;
-  font-size: 12px; padding: 2px 4px; transition: color 0.15s; line-height: 1;
+  font-size: 12px; padding: 2px 4px; transition: color 150ms var(--ease); line-height: 1;
 }
 .clock-collapse-btn:hover { color: var(--text); }
 </style>

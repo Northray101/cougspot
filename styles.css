@@ -21,7 +21,7 @@
   --success:        #6B8E5A;
 
   --shadow-modal:   0 12px 32px -12px rgba(0,0,0,0.18);
-  --ease:           cubic-bezier(0.2, 0, 0, 1);
+  --ease:           cubic-bezier(0.32, 0.72, 0, 1);
 
   --serif:          'Source Serif 4', Georgia, serif;
 }
@@ -793,7 +793,7 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   height: 100%;
   background: var(--accent);
   border-radius: 9999px;
-  transition: width 1s linear;
+  transition: width 400ms var(--ease);
 }
 
 .periods-list {

@@ -31,7 +31,7 @@
   --radius-full: 9999px;
 
   /* Easing aliases */
-  --ease-golden: cubic-bezier(0.2, 0, 0, 1);
+  --ease-golden: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* ── Avatar ── */
@@ -48,7 +48,7 @@
   flex-shrink: 0;
   user-select: none;
   border: 1px solid var(--border);
-  transition: transform 200ms var(--ease-golden);
+  transition: transform 150ms var(--ease-golden);
 }
 .soc-avatar.size-xs { --size: 24px; }
 .soc-avatar.size-sm { --size: 32px; }
@@ -78,7 +78,7 @@
   color: var(--text-muted);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: color 160ms var(--ease-golden), background 160ms var(--ease-golden), border-color 160ms var(--ease-golden);
+  transition: color 150ms var(--ease-golden), background 150ms var(--ease-golden), border-color 150ms var(--ease-golden);
 }
 .soc-nav-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border-strong); }
 .soc-nav-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -104,7 +104,7 @@
   backdrop-filter: blur(2px);
   display: none;
   z-index: 999;
-  animation: soc-fade 180ms var(--ease-golden);
+  animation: soc-fade 150ms var(--ease-golden);
 }
 .soc-sheet-overlay.open { display: block; }
 @keyframes soc-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -124,7 +124,7 @@
   z-index: 1000;
   display: flex; flex-direction: column;
   overflow: hidden;
-  transition: transform 220ms var(--ease-golden);
+  transition: transform 250ms var(--ease-golden);
 }
 .soc-sheet-overlay.open .soc-sheet { transform: translateX(-50%) translateY(0); }
 .soc-sheet-grip {
@@ -185,7 +185,7 @@
   cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
   gap: 6px;
-  transition: background 180ms var(--ease-golden), color 180ms var(--ease-golden), border-color 180ms var(--ease-golden);
+  transition: background 150ms var(--ease-golden), color 150ms var(--ease-golden), border-color 150ms var(--ease-golden);
 }
 .soc-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .soc-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
@@ -226,7 +226,7 @@
   border-radius: var(--radius-md);
   font-size: 22px; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
-  transition: border-color 160ms var(--ease-golden), background 160ms var(--ease-golden);
+  transition: border-color 150ms var(--ease-golden), background 150ms var(--ease-golden);
 }
 .soc-emoji-cell:hover { border-color: var(--accent); background: var(--surface); }
 .soc-emoji-cell.selected {
@@ -247,7 +247,7 @@
   font-family: 'Inter', sans-serif;
   font-size: var(--text-sm);
   outline: none;
-  transition: border-color 160ms var(--ease-golden), box-shadow 160ms var(--ease-golden);
+  transition: border-color 150ms var(--ease-golden), box-shadow 150ms var(--ease-golden);
 }
 .soc-input:focus, .soc-textarea:focus {
   border-color: var(--accent);
@@ -272,7 +272,7 @@
   font-size: 13px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: background 180ms var(--ease-golden), border-color 180ms var(--ease-golden), color 180ms var(--ease-golden);
+  transition: background 150ms var(--ease-golden), border-color 150ms var(--ease-golden), color 150ms var(--ease-golden);
 }
 .soc-reaction:hover { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
 .soc-reaction.active {
@@ -292,7 +292,7 @@
   border-radius: var(--radius-md);
   background: transparent; border: 0; color: var(--text-muted);
   cursor: pointer;
-  transition: background 160ms var(--ease-golden), color 160ms var(--ease-golden);
+  transition: background 150ms var(--ease-golden), color 150ms var(--ease-golden);
 }
 .post-menu-btn:hover { background: var(--surface); color: var(--text); }
 .post-menu-pop {
@@ -305,7 +305,7 @@
   padding: 6px;
   display: none; z-index: 5;
 }
-.post-menu-pop.open { display: block; animation: soc-fade 160ms var(--ease-golden); }
+.post-menu-pop.open { display: block; animation: soc-fade 150ms var(--ease-golden); }
 .post-menu-item {
   width: 100%; text-align: left;
   background: transparent; border: 0;
@@ -318,7 +318,7 @@
 .post-menu-item:hover { background: var(--surface); }
 .post-menu-item.danger { color: var(--danger); }
 .post-card.collapsing {
-  animation: soc-collapse 380ms var(--ease-golden) forwards;
+  animation: soc-collapse 400ms var(--ease-golden) forwards;
   pointer-events: none;
 }
 @keyframes soc-collapse {
@@ -340,7 +340,7 @@
   box-shadow: var(--shadow-modal);
   z-index: 1100;
   font-size: var(--text-sm);
-  transition: transform 220ms var(--ease-golden);
+  transition: transform 250ms var(--ease-golden);
 }
 .soc-undo-toast.show { transform: translateX(-50%) translateY(0); }
 .soc-undo-toast .soc-btn { height: 32px; min-width: 64px; }
@@ -354,7 +354,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: border-color 160ms var(--ease-golden), background 160ms var(--ease-golden);
+  transition: border-color 150ms var(--ease-golden), background 150ms var(--ease-golden);
 }
 .soc-row:hover { border-color: var(--border-strong); background: var(--surface); }
 .soc-row .grow { flex: 1; min-width: 0; }
@@ -368,7 +368,7 @@
   background: transparent; border: 0; color: var(--text-muted);
   font-family: inherit; font-size: var(--text-sm); font-weight: 500;
   border-radius: var(--radius-sm); cursor: pointer;
-  transition: background 180ms var(--ease-golden), color 180ms var(--ease-golden);
+  transition: background 150ms var(--ease-golden), color 150ms var(--ease-golden);
 }
 .soc-tab.active { background: var(--surface-raised); color: var(--text); }
 
@@ -411,7 +411,7 @@
   font-size: var(--text-sm);
   line-height: 1.45;
   word-wrap: break-word;
-  animation: soc-pop 220ms var(--ease-golden);
+  animation: soc-pop 250ms var(--ease-golden);
 }
 @keyframes soc-pop {
   from { opacity: 0; transform: translateY(4px); }
@@ -443,7 +443,7 @@
   color: var(--text);
   font-family: 'Inter', sans-serif; font-size: var(--text-base);
   outline: none;
-  transition: border-color 160ms var(--ease-golden), box-shadow 160ms var(--ease-golden);
+  transition: border-color 150ms var(--ease-golden), box-shadow 150ms var(--ease-golden);
 }
 .soc-search-input:focus-visible {
   border-color: var(--accent);
