@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bookmarks — CougSpot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  .bookmarks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .bookmark-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 150ms var(--ease), background 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .bookmark-card:hover {
+    border-color: var(--accent);
+    background: var(--surface);
+    transform: translateY(-1px);
+  }
+  .bookmark-favicon {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .bookmark-favicon img {
+    width: 24px; height: 24px;
+    display: block;
+  }
+  .bookmark-body { flex: 1; min-width: 0; }
+  .bookmark-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .bookmark-name .arrow {
+    color: var(--text-faint);
+    transition: color 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .bookmark-card:hover .arrow {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+  .bookmark-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.45;
+    font-weight: 400;
+  }
+  .bookmark-host {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 6px;
+    font-family: 'Inter', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="screen active">
+
+    <!-- NAV -->
+    <nav class="nav">
+      <div class="nav-left">
+        <div class="logo-icon" style="width:34px;height:34px;border-radius:9px;">
+          <svg width="18" height="18" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="17" r="7" fill="#C15F3C"/>
+            <circle cx="22" cy="17" r="3" fill="#A84F2E"/>
+            <path d="M13 34c0-4.97 4.03-9 9-9s9 4.03 9 9" fill="#C15F3C" opacity=".8"/>
+            <circle cx="29" cy="12" r="3" fill="#A84F2E" opacity=".9"/>
+          </svg>
+        </div>
+        <span class="nav-wordmark">
+          <span style="color:var(--text)">Coug</span><span style="color:var(--accent)">Spot</span>
+        </span>
+        <div class="nav-links">
+          <a class="nav-link" href="index.html">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Feed
+          </a>
+          <a class="nav-link" href="sports.html">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+            Sports
+          </a>
+          <a class="nav-link active" href="bookmarks.html">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Bookmarks
+          </a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="avatar" id="nav-avatar-bookmarks">?</div>
+        <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="signOut()">Sign out</button>
+      </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <div class="section-head">
+        <div>
+          <div class="page-title">Bookmarks</div>
+          <div class="page-subtitle">Quick links to popular AI tools and study sites</div>
+        </div>
+      </div>
+
+      <div class="bookmarks-grid" id="bookmarks-grid"></div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL  = 'https://dqcyecscdelfikbimnpw.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxY3llY3NjZGVsZmlrYmltbnB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzIwOTUsImV4cCI6MjA5Mzc0ODA5NX0.PIl0Syj--UQNjtMKNjAWmisYwOA50Aw5ICNv6J-UNDQ';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const BOOKMARKS = [
+  { name: 'Cloak',   host: 'chat.usecloak.org',  url: 'https://chat.usecloak.org',   desc: 'Private AI chat that keeps your conversations encrypted.' },
+  { name: 'ChatGPT', host: 'chat.openai.com',    url: 'https://chat.openai.com',     desc: 'OpenAI’s general-purpose chatbot for writing, code, and ideas.' },
+  { name: 'Claude',  host: 'claude.ai',          url: 'https://claude.ai',           desc: 'Anthropic’s assistant — strong at long docs and careful reasoning.' },
+  { name: 'Gemini',  host: 'gemini.google.com',  url: 'https://gemini.google.com',   desc: 'Google’s multimodal AI with deep search integration.' },
+  { name: 'Gauth',   host: 'gauthmath.com',      url: 'https://gauthmath.com',       desc: 'Step-by-step homework helper for math and science problems.' },
+];
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderBookmarks() {
+  const grid = document.getElementById('bookmarks-grid');
+  grid.innerHTML = BOOKMARKS.map((b, i) => `
+    <a class="bookmark-card" href="${escHtml(b.url)}" target="_blank" rel="noopener noreferrer"
+       style="animation: fadeUp 250ms var(--ease) ${i * 40}ms both">
+      <div class="bookmark-favicon">
+        <img src="https://www.google.com/s2/favicons?domain=${escHtml(b.host)}&sz=64"
+             alt="" loading="lazy"
+             onerror="this.style.display='none'"/>
+      </div>
+      <div class="bookmark-body">
+        <div class="bookmark-name">
+          ${escHtml(b.name)}
+          <svg class="arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l10-10"/><path d="M7 7h10v10"/></svg>
+        </div>
+        <div class="bookmark-desc">${escHtml(b.desc)}</div>
+        <div class="bookmark-host">${escHtml(b.host)}</div>
+      </div>
+    </a>`).join('');
+}
+
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+  const username = session.user.user_metadata?.username || '?';
+  const el = document.getElementById('nav-avatar-bookmarks');
+  if (el) el.textContent = username.slice(0, 2).toUpperCase();
+  renderBookmarks();
+});
+
+async function signOut() {
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
