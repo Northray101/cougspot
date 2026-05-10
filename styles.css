@@ -76,7 +76,14 @@ html {
 
 body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(--text); }
 
-#app { position: relative; z-index: 1; }
+#app {
+  position: relative;
+  z-index: 1;
+  transition: margin-right 320ms cubic-bezier(0.32,0.72,0,1);
+}
+body.cloak-open #app {
+  margin-right: 380px;
+}
 
 /* ── Screens ── */
 .screen { display: none; min-height: 100vh; }
@@ -1089,7 +1096,6 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
   margin: 0 auto;
   padding: 28px 24px;
   align-items: start;
-  transition: padding-right 320ms cubic-bezier(0.32,0.72,0,1);
 }
 
 .home-main {
@@ -1311,22 +1317,12 @@ body.cloak-open .nav-cloak-btn {
   transform: translateX(0);
 }
 
-body.cloak-open .home-wrap {
-  padding-right: 404px;
-}
-
 .cloak-panel-overlay {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 199;
   background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-}
-
-body.cloak-open .cloak-panel-overlay {
-  display: block;
 }
 
 .cloak-panel-header {
@@ -1457,15 +1453,14 @@ body.cloak-open .cloak-panel-overlay {
     width: 100%;
     position: static;
   }
-  body.cloak-open .home-wrap {
-    padding-right: 16px;
+  body.cloak-open #app {
+    margin-right: 0;
   }
   .cloak-panel {
     width: 100%;
     box-shadow: none;
   }
-  .cloak-panel-overlay { display: none !important; }
-  body.cloak-open .cloak-panel-overlay { display: block !important; }
+  body.cloak-open .cloak-panel-overlay { display: block; }
 }
 
 @media (max-width: 540px) {
