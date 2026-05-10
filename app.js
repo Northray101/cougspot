@@ -311,7 +311,8 @@ function initHomeGreeting(username) {
 /* ════════════════════════════════════════════
    CLOAK AI CHATBOT
 ════════════════════════════════════════════ */
-const CLOAK_API    = `${SUPABASE_URL}/functions/v1/cloak-chat`;
+const CLOAK_API    = 'https://api.usecloak.org/v1/chat';
+const CLOAK_MODEL  = 'pneuma';
 const CLOAK_SYSTEM = 'You are a helpful assistant for Norco High School students. Be concise, friendly, and helpful with school-related topics, homework, and general questions.';
 
 let chatHistory = []; // { role: 'user'|'assistant', message: '...' }
@@ -354,14 +355,13 @@ async function sendChatMessage() {
   try {
     const res = await fetch(CLOAK_API, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        model: CLOAK_MODEL,
         message: content,
         chat_history: chatHistory.slice(0, -1),
         system_prompt: CLOAK_SYSTEM,
+        temperature: 0.7,
       }),
     });
     const json = await res.json();
