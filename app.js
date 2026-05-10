@@ -92,6 +92,7 @@ function enterHome() {
     const inner = socAvatar.querySelector('.soc-avatar');
     if (inner) inner.textContent = init;
   }
+  initHomeGreeting(uname === '?' ? null : uname);
   loadDashboardStats();
   loadLatestAnnouncement();
   subscribeAnnouncements();
@@ -292,6 +293,22 @@ async function loadDashboardStats() {
 }
 
 /* ════════════════════════════════════════════
+   HOME WELCOME
+════════════════════════════════════════════ */
+function initHomeGreeting(username) {
+  const greetEl = document.getElementById('home-greeting');
+  const dateEl  = document.getElementById('home-date');
+  if (greetEl && username) {
+    const h = new Date().getHours();
+    const tod = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    greetEl.textContent = `${tod}, @${username}`;
+  }
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+}
+
+/* ════════════════════════════════════════════
    CLOAK AI CHATBOT
 ════════════════════════════════════════════ */
 const CLOAK_API    = 'https://api.usecloak.org/v1/chat';
@@ -305,13 +322,14 @@ function chatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
 }
 
-function toggleChat() {
-  const popup = document.getElementById('cloak-popup');
-  if (!popup) return;
-  popup.classList.toggle('open');
-  if (popup.classList.contains('open')) {
+function toggleCloak() {
+  const panel = document.getElementById('cloak-panel');
+  if (!panel) return;
+  const isOpen = panel.classList.toggle('open');
+  document.body.classList.toggle('cloak-open', isOpen);
+  if (isOpen) {
     const input = document.getElementById('chat-input');
-    if (input) setTimeout(() => input.focus(), 50);
+    if (input) setTimeout(() => input.focus(), 80);
   }
 }
 
@@ -341,7 +359,7 @@ async function sendChatMessage() {
       body: JSON.stringify({
         model: CLOAK_MODEL,
         message: content,
-        chat_history: chatHistory.slice(0, -1), // all but last (the one we just sent)
+        chat_history: chatHistory.slice(0, -1),
         system_prompt: CLOAK_SYSTEM,
         temperature: 0.7,
       }),
@@ -351,7 +369,7 @@ async function sendChatMessage() {
     const reply = json.text || 'No response received.';
     chatHistory.push({ role: 'assistant', message: reply });
   } catch (e) {
-    chatHistory.push({ role: 'assistant', message: 'Could not reach Cloak AI. Check your connection.' });
+    chatHistory.push({ role: 'assistant', message: 'Could not reach Cloak AI. Check your connection or try again later.' });
   }
 
   chatTyping = false;
