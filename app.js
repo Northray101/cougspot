@@ -353,20 +353,22 @@ async function sendChatMessage() {
   }
 
   try {
+    const messages = [
+      { role: 'system', content: CLOAK_SYSTEM },
+      ...chatHistory.slice(0, -1).map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.message,
+      })),
+      { role: 'user', content },
+    ];
     const res = await fetch(CLOAK_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: CLOAK_MODEL,
-        message: content,
-        chat_history: chatHistory.slice(0, -1),
-        system_prompt: CLOAK_SYSTEM,
-        temperature: 0.7,
-      }),
+      body: JSON.stringify({ model: CLOAK_MODEL, messages }),
     });
     const json = await res.json();
-    if (json.error) throw new Error(json.error);
-    const reply = json.text || 'No response received.';
+    if (json.error) throw new Error(typeof json.error === 'string' ? json.error : JSON.stringify(json.error));
+    const reply = json.response || 'No response received.';
     chatHistory.push({ role: 'assistant', message: reply });
   } catch (e) {
     chatHistory.push({ role: 'assistant', message: 'Could not reach Cloak AI. Check your connection or try again later.' });
