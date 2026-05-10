@@ -93,7 +93,7 @@
     </div>
   </div>
 
-  <!-- HOME — Dashboard -->
+  <!-- HOME -->
   <div id="screen-home" class="screen">
     <nav class="nav">
       <div class="nav-left">
@@ -142,6 +142,10 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           <span class="notif-dot" id="dot-messages"></span>
         </button>
+        <button class="nav-cloak-btn" id="cloak-nav-btn" onclick="toggleCloak()" title="Ask Cloak AI">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5S7 9.76 7 7a5 5 0 0 1 5-5z"/><path d="M3 21c0-4 2.5-7 9-7s9 3 9 7"/><circle cx="18" cy="8" r="3" fill="currentColor" opacity=".25"/><path d="M17 6l1 1 2-2" stroke-width="1.5"/></svg>
+          <span>Cloak</span>
+        </button>
         <button class="nav-icon-btn" title="Admin" onclick="openAdminGate()">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </button>
@@ -153,14 +157,87 @@
       </div>
     </nav>
 
-    <!-- DASHBOARD BODY -->
-    <div class="dashboard-body">
+    <!-- HOME BODY -->
+    <div class="home-wrap">
 
-      <!-- RIGHT COLUMN: Clock + Announcements -->
-      <div class="dash-right-col">
+      <!-- MAIN CONTENT -->
+      <div class="home-main">
+
+        <!-- Welcome card -->
+        <div class="home-welcome" style="animation: fadeUp 350ms var(--ease) both">
+          <div class="home-welcome-inner">
+            <div>
+              <div class="home-welcome-greeting" id="home-greeting">Welcome back</div>
+              <div class="home-welcome-sub" id="home-date"></div>
+            </div>
+            <div class="home-welcome-badge">Norco Cougars</div>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="home-stats" style="animation: fadeUp 350ms var(--ease) 60ms both">
+          <div class="home-stat">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span><strong id="stat-posts">—</strong> posts</span>
+          </div>
+          <div class="home-stat-divider"></div>
+          <div class="home-stat">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span><strong id="stat-friends">—</strong> friends</span>
+          </div>
+        </div>
+
+        <!-- Quick-links grid -->
+        <div class="home-grid" style="animation: fadeUp 350ms var(--ease) 120ms both">
+          <a class="home-card" href="feed.html">
+            <div class="home-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </div>
+            <div class="home-card-body">
+              <div class="home-card-name">Student Feed</div>
+              <div class="home-card-desc">Posts, comments, reactions</div>
+            </div>
+            <svg class="home-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a class="home-card" href="games.html">
+            <div class="home-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+            </div>
+            <div class="home-card-body">
+              <div class="home-card-name">Games</div>
+              <div class="home-card-desc">HTML5 · Retro · Puzzle</div>
+            </div>
+            <svg class="home-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a class="home-card" href="sports.html">
+            <div class="home-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+            </div>
+            <div class="home-card-body">
+              <div class="home-card-name">Cougars Sports</div>
+              <div class="home-card-desc">Schedules &amp; scores</div>
+            </div>
+            <svg class="home-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+          <a class="home-card" href="bookmarks.html">
+            <div class="home-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="home-card-body">
+              <div class="home-card-name">Bookmarks</div>
+              <div class="home-card-desc">AI tools &amp; study links</div>
+            </div>
+            <svg class="home-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+      </div><!-- .home-main -->
+
+      <!-- SIDEBAR: Clock + Announcements -->
+      <div class="home-sidebar">
 
         <!-- PERIOD CLOCK -->
-        <div class="panel-card" style="animation: fadeUp 400ms var(--ease) 60ms both">
+        <div class="panel-card" style="animation: fadeUp 350ms var(--ease) 80ms both">
           <div class="panel-card-head">
             <span>Period Clock</span>
             <div style="display:flex;align-items:center;gap:6px;">
@@ -182,7 +259,7 @@
         </div>
 
         <!-- ANNOUNCEMENTS -->
-        <div class="panel-card" style="animation: fadeUp 400ms var(--ease) 120ms both">
+        <div class="panel-card" style="animation: fadeUp 350ms var(--ease) 140ms both">
           <div class="panel-card-head"><span>Announcements</span></div>
           <div id="announcement-body">
             <p class="announcement-empty">No announcements right now.</p>
@@ -196,57 +273,8 @@
           </div>
         </div>
 
-      </div><!-- .dash-right-col -->
-
-      <!-- BOTTOM ROW: Stats + Quick-links -->
-      <div class="dash-bottom">
-
-        <!-- Stats -->
-        <div class="dash-stats" style="animation: fadeUp 400ms var(--ease) 180ms both">
-          <div class="dash-stat-chip">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span id="stat-posts">—</span> posts
-          </div>
-          <div class="dash-stat-chip">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span id="stat-friends">—</span> friends
-          </div>
-        </div>
-
-        <!-- Quick-links -->
-        <div class="dash-quicklinks" style="animation: fadeUp 400ms var(--ease) 240ms both">
-          <a class="dash-quicklink-card" href="feed.html">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            <div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:2px">Student Feed</div>
-              <div style="font-size:12px;color:var(--text-muted)">Posts, comments, reactions</div>
-            </div>
-          </a>
-          <a class="dash-quicklink-card" href="games.html">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
-            <div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:2px">Games</div>
-              <div style="font-size:12px;color:var(--text-muted)">HTML5 · Retro · Puzzle</div>
-            </div>
-          </a>
-          <a class="dash-quicklink-card" href="sports.html">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
-            <div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:2px">Cougars Sports</div>
-              <div style="font-size:12px;color:var(--text-muted)">Schedules &amp; scores</div>
-            </div>
-          </a>
-          <a class="dash-quicklink-card" href="bookmarks.html">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            <div>
-              <div style="font-weight:600;font-size:14px;margin-bottom:2px">Bookmarks</div>
-              <div style="font-size:12px;color:var(--text-muted)">AI tools &amp; study links</div>
-            </div>
-          </a>
-        </div>
-
-      </div><!-- .dash-bottom -->
-    </div><!-- .dashboard-body -->
+      </div><!-- .home-sidebar -->
+    </div><!-- .home-wrap -->
   </div><!-- #screen-home -->
 
 </div><!-- #app -->
@@ -454,21 +482,16 @@
   </div>
 </div>
 
-<!-- CLOAK AI BUBBLE -->
-<button class="cloak-bubble" id="cloak-bubble" onclick="toggleChat()" title="Ask Cloak AI">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-  <span class="cloak-bubble-label">Cloak AI</span>
-</button>
-
-<div class="cloak-popup" id="cloak-popup">
-  <div class="cloak-popup-bar">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="width:7px;height:7px;background:var(--success);border-radius:50%;display:inline-block;animation:pulse 2s ease-in-out infinite;flex-shrink:0"></span>
-      <span style="font-size:13px;font-weight:600;color:var(--text)">Cloak AI</span>
+<!-- CLOAK SIDE PANEL -->
+<div class="cloak-panel" id="cloak-panel">
+  <div class="cloak-panel-header">
+    <div style="display:flex;align-items:center;gap:9px">
+      <span class="cloak-pulse-dot"></span>
+      <span class="cloak-panel-title">Cloak AI</span>
     </div>
-    <button class="cloak-popup-close" onclick="toggleChat()" title="Close">✕</button>
+    <button class="cloak-panel-close" onclick="toggleCloak()" title="Close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
   </div>
   <div class="chat-messages" id="chat-messages">
     <div class="chat-bubble bot" style="animation:none">Hi! I'm Cloak AI. Ask me anything — homework help, study tips, school questions, whatever you need.</div>
@@ -478,6 +501,7 @@
     <button class="btn btn-primary" style="align-self:flex-end;padding:8px 14px;font-size:13px" onclick="sendChatMessage()">Send</button>
   </div>
 </div>
+<div class="cloak-panel-overlay" id="cloak-overlay" onclick="toggleCloak()"></div>
 
 <!-- TOAST -->
 <div id="toast"></div>
