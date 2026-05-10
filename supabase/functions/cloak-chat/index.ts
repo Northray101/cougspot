@@ -5,54 +5,37 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const CLOAK_API   = 'https://api.usecloak.org/v1/chat'
+const CLOAK_MODEL = 'pneuma'
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS })
   }
 
   try {
-    const { message, chat_history = [], system_prompt } = await req.json()
+    const { model = CLOAK_MODEL, messages } = await req.json()
 
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'message is required' }), {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'messages array is required' }), {
         status: 400,
         headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
       })
     }
 
-    const messages = [
-      ...chat_history.map((m: { role: string; message: string }) => ({
-        role: m.role === 'user' ? 'user' : 'assistant',
-        content: m.message,
-      })),
-      { role: 'user', content: message },
-    ]
-
-    const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
-    if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set')
-
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLOAK_API, {
       method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        system: system_prompt ?? 'You are a helpful assistant for Norco High School students.',
-        messages,
-      }),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model, messages }),
     })
 
     const data = await res.json()
 
-    if (data.error) throw new Error(data.error.message ?? JSON.stringify(data.error))
+    if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error))
 
-    const text: string = data.content?.[0]?.text ?? 'No response received.'
+    const text: string = data.response ?? 'No response received.'
 
-    return new Response(JSON.stringify({ text }), {
+    return new Response(JSON.stringify({ response: text }), {
       headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
     })
   } catch (e: unknown) {

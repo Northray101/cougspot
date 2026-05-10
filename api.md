@@ -57,7 +57,7 @@ The `sendChatMessage()` function builds the full `messages` array from `chatHist
 
 ## Supabase Edge Function: `cloak-chat`
 
-A server-side Anthropic proxy, deployed to Supabase project `dqcyecscdelfikbimnpw`. Not currently used by the frontend (frontend calls Cloak directly), but available as a fallback.
+A server-side proxy to `api.usecloak.org/v1/chat` (native endpoint), deployed to Supabase project `dqcyecscdelfikbimnpw`. Available as a fallback or for server-side callers; the frontend calls Cloak directly.
 
 **URL:** `https://dqcyecscdelfikbimnpw.supabase.co/functions/v1/cloak-chat`
 
@@ -65,18 +65,20 @@ A server-side Anthropic proxy, deployed to Supabase project `dqcyecscdelfikbimnp
 
 **Auth:** `verify_jwt: false` (no Authorization header required)
 
-**Request:**
+**Request:** same native format as the direct Cloak API
 ```json
 {
-  "message": "User message",
-  "chat_history": [{ "role": "user", "message": "..." }, { "role": "assistant", "message": "..." }],
-  "system_prompt": "Optional system override"
+  "model": "pneuma",
+  "messages": [
+    { "role": "system", "content": "System prompt." },
+    { "role": "user", "content": "User message." }
+  ]
 }
 ```
 
 **Response:**
 ```json
-{ "text": "Claude's reply" }
+{ "response": "The model's reply text." }
 ```
 
 **Deploy:**
@@ -84,7 +86,4 @@ A server-side Anthropic proxy, deployed to Supabase project `dqcyecscdelfikbimnp
 supabase functions deploy cloak-chat --project-ref dqcyecscdelfikbimnpw
 ```
 
-**Secret required:**
-```bash
-supabase secrets set ANTHROPIC_API_KEY=sk-ant-... --project-ref dqcyecscdelfikbimnpw
-```
+No secrets or API keys required — Cloak is a public API.
