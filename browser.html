@@ -494,7 +494,7 @@ html, body { height: 100vh; overflow: hidden; }
     <!-- The proxied browser iframe -->
     <iframe
       id="browser-frame"
-      sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-downloads"
+      sandbox="allow-scripts allow-forms allow-popups allow-downloads"
       allow="fullscreen"
     ></iframe>
 
@@ -532,6 +532,7 @@ let navHistory = [];
 let hIdx = -1;
 let currentUrl = '';
 let loading = false;
+let currentAbort = null;
 
 // ── Auth check ──
 (async () => {
@@ -592,10 +593,11 @@ function setLoading(v) {
 
 // ── Screen helpers ──
 function showHome() {
+  if (currentAbort) { currentAbort.abort(); currentAbort = null; }
   homeEl.style.display  = 'flex';
   frame.style.display   = 'none';
   errorEl.classList.remove('visible');
-  frame.src = 'about:blank';
+  frame.srcdoc = '';
   currentUrl = '';
   urlInput.value = '';
   updateSsl('');
@@ -632,7 +634,10 @@ function navigate(url) {
   loadUrl(normalized);
 }
 
-function loadUrl(url) {
+async function loadUrl(url) {
+  if (currentAbort) { currentAbort.abort(); }
+  currentAbort = new AbortController();
+
   currentUrl = url;
   urlInput.value = url;
   urlClear.style.display = 'block';
@@ -640,7 +645,27 @@ function loadUrl(url) {
   setLoading(true);
   showFrame();
   updateNavButtons();
-  frame.src = PROXY + '?url=' + encodeURIComponent(url);
+
+  try {
+    const resp = await fetch(
+      PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url),
+      { headers: { 'apikey': SUPABASE_ANON }, signal: currentAbort.signal }
+    );
+    currentAbort = null;
+
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => '');
+      showError('HTTP ' + resp.status + (text ? ' — ' + text.slice(0, 120) : ''));
+      return;
+    }
+
+    const html = await resp.text();
+    frame.srcdoc = html;
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    showError('Could not load: ' + (e.message || String(e)));
+    setLoading(false);
+  }
 }
 
 // ── Button listeners ──
@@ -654,7 +679,8 @@ btnFwd.addEventListener('click', () => {
 
 btnRefresh.addEventListener('click', () => {
   if (loading) {
-    frame.src = 'about:blank';
+    if (currentAbort) { currentAbort.abort(); currentAbort = null; }
+    frame.srcdoc = '';
     setLoading(false);
   } else if (currentUrl) {
     loadUrl(currentUrl);
@@ -686,11 +712,7 @@ document.getElementById('home-go').addEventListener('click', () => navigate(home
 
 // ── Iframe events ──
 frame.addEventListener('load', () => {
-  if (frame.src && frame.src !== 'about:blank') setLoading(false);
-});
-
-frame.addEventListener('error', () => {
-  showError('The page could not be reached. The site may be down or blocking proxy access.');
+  setLoading(false);
 });
 
 // ── Messages from proxied pages ──
@@ -704,6 +726,9 @@ window.addEventListener('message', e => {
   }
   if (e.data.type === 'proxy-title' && e.data.title) {
     document.title = e.data.title + ' — CougSpot Browser';
+  }
+  if (e.data.type === 'proxy-click' && e.data.url) {
+    navigate(e.data.url);
   }
 });
 

@@ -5,17 +5,19 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const PROXY_BASE = 'https://dqcyecscdelfikbimnpw.supabase.co/functions/v1/web-proxy'
+const PROXY_ORIGIN = 'https://dqcyecscdelfikbimnpw.supabase.co/functions/v1/web-proxy'
 
+// Headers we never forward from the proxied site to the browser
 const STRIP_HEADERS = new Set([
   'content-security-policy',
   'content-security-policy-report-only',
   'x-frame-options',
   'x-xss-protection',
   'strict-transport-security',
-  'content-encoding',
+  'content-encoding',  // Deno decompresses automatically; forwarding this confuses browsers
   'transfer-encoding',
-  'content-length',
+  'content-length',    // body changes size after rewriting
+  'content-type',      // we set this ourselves
 ])
 
 function resolveUrl(rel: string, base: string): string {
@@ -24,60 +26,80 @@ function resolveUrl(rel: string, base: string): string {
   try { return new URL(rel, base).href } catch { return rel }
 }
 
-function proxyUrl(url: string, base: string): string {
+function makeProxyUrl(url: string, base: string, proxyBase: string): string {
   if (!url || /^(#|javascript:|data:|blob:|mailto:|tel:)/.test(url)) return url
   const abs = resolveUrl(url, base)
   if (!/^https?:\/\//.test(abs)) return url
-  return `${PROXY_BASE}?url=${encodeURIComponent(abs)}`
+  return proxyBase + encodeURIComponent(abs)
 }
 
-function rewriteHtml(html: string, base: string): string {
-  // Remove existing base tags so they don't interfere with our rewriting
+function rewriteHtml(html: string, base: string, proxyBase: string): string {
+  // Strip existing base and CSP meta tags
   html = html.replace(/<base\b[^>]*>/gi, '')
-  // Strip CSP meta tags that would block our injected script
   html = html.replace(/<meta[^>]+http-equiv\s*=\s*["']?content-security-policy["']?[^>]*>/gi, '')
 
-  // href attributes — skip anchors, javascript:, mailto:, tel:
+  const px = (url: string) => makeProxyUrl(url, base, proxyBase)
+
+  // href — skip anchors, javascript:, mailto:, tel:
   html = html.replace(/\bhref="([^"]*)"/gi, (m, u) =>
-    (!u || /^(#|javascript:|mailto:|tel:)/.test(u)) ? m : `href="${proxyUrl(u, base)}"`)
+    (!u || /^(#|javascript:|mailto:|tel:)/.test(u)) ? m : `href="${px(u)}"`)
   html = html.replace(/\bhref='([^']*)'/gi, (m, u) =>
-    (!u || /^(#|javascript:|mailto:|tel:)/.test(u)) ? m : `href='${proxyUrl(u, base)}'`)
+    (!u || /^(#|javascript:|mailto:|tel:)/.test(u)) ? m : `href='${px(u)}'`)
 
-  // src attributes
+  // src
   html = html.replace(/\bsrc="([^"]*)"/gi, (m, u) =>
-    (!u || /^(data:|blob:)/.test(u)) ? m : `src="${proxyUrl(u, base)}"`)
+    (!u || /^(data:|blob:)/.test(u)) ? m : `src="${px(u)}"`)
   html = html.replace(/\bsrc='([^']*)'/gi, (m, u) =>
-    (!u || /^(data:|blob:)/.test(u)) ? m : `src='${proxyUrl(u, base)}'`)
+    (!u || /^(data:|blob:)/.test(u)) ? m : `src='${px(u)}'`)
 
-  // action attributes (forms)
-  html = html.replace(/\baction="([^"]*)"/gi, (_, u) => u ? `action="${proxyUrl(u, base)}"` : _)
+  // action (forms)
+  html = html.replace(/\baction="([^"]*)"/gi, (_, u) => u ? `action="${px(u)}"` : _)
 
-  // srcset attributes
+  // srcset
   html = html.replace(/\bsrcset="([^"]*)"/gi, (_, s: string) => {
     const parts = s.split(',').map((part: string) => {
       const trimmed = part.trim()
       const match = trimmed.match(/^(\S+)(.*)$/)
       if (!match) return trimmed
-      return proxyUrl(match[1], base) + match[2]
+      return px(match[1]) + match[2]
     })
     return `srcset="${parts.join(', ')}"`
   })
 
   // Inline style url()
   html = html.replace(/\bstyle="([^"]*)"/gi, (_, css: string) =>
-    `style="${rewriteCss(css, base)}"`)
+    `style="${rewriteCss(css, base, proxyBase)}"`)
 
-  // Inject postMessage reporter: tells the parent frame our current URL and page title
-  const script = `<script>(function(){try{var p=new URLSearchParams(location.search),u=p.get('url');if(u&&parent!==window){parent.postMessage({type:'proxy-nav',url:u},'*');var mo=new MutationObserver(function(){if(document.title)parent.postMessage({type:'proxy-title',title:document.title},'*')});mo.observe(document.documentElement,{subtree:true,characterData:true,childList:true})}}catch(e){}})()</script>`
+  // Inject navigation reporter + link-click interceptor.
+  // BASE is embedded directly because when loaded via srcdoc, location.search has no ?url= param.
+  const escapedBase = JSON.stringify(base)
+  const script = `<script>(function(){try{
+var BASE=${escapedBase};
+if(parent!==window){
+  parent.postMessage({type:'proxy-nav',url:BASE},'*');
+  var mo=new MutationObserver(function(){
+    if(document.title)parent.postMessage({type:'proxy-title',title:document.title},'*');
+  });
+  mo.observe(document.documentElement,{subtree:true,characterData:true,childList:true});
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href]');
+    if(!a)return;
+    try{
+      var pu=new URL(a.href),ou=pu.searchParams.get('url');
+      if(ou){e.preventDefault();e.stopPropagation();parent.postMessage({type:'proxy-click',url:ou},'*');}
+    }catch(x){}
+  },true);
+}
+}catch(e){}})()</script>`
 
   if (html.includes('</head>')) return html.replace('</head>', script + '</head>')
   if (/<body[\s>]/i.test(html)) return html.replace(/<body[\s>]/i, (m) => script + m)
   return script + html
 }
 
-function rewriteCss(css: string, base: string): string {
+function rewriteCss(css: string, base: string, proxyBase: string): string {
   return css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) =>
-    u.startsWith('data:') ? m : `url(${q}${proxyUrl(u, base)}${q})`)
+    u.startsWith('data:') ? m : `url(${q}${makeProxyUrl(u, base, proxyBase)}${q})`)
 }
 
 serve(async (req: Request) => {
@@ -85,14 +107,20 @@ serve(async (req: Request) => {
 
   const { searchParams } = new URL(req.url)
   const target = searchParams.get('url')
+  const apikey = searchParams.get('apikey') || req.headers.get('apikey') || ''
+
   if (!target) return new Response('url required', { status: 400, headers: CORS })
 
-  // Validate URL and block private/internal addresses
-  let _parsed: URL
+  // Build proxy base that propagates the apikey into every rewritten URL
+  const proxyBase = apikey
+    ? `${PROXY_ORIGIN}?apikey=${encodeURIComponent(apikey)}&url=`
+    : `${PROXY_ORIGIN}?url=`
+
+  // Validate and block private/internal addresses
   try {
-    _parsed = new URL(target)
-    if (!['http:', 'https:'].includes(_parsed.protocol)) throw new Error('bad protocol')
-    const h = _parsed.hostname.toLowerCase()
+    const p = new URL(target)
+    if (!['http:', 'https:'].includes(p.protocol)) throw new Error('bad protocol')
+    const h = p.hostname.toLowerCase()
     if (/^(localhost|127\.\d+|::1|0\.0\.0\.0|192\.168\.|10\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.)/.test(h)) {
       return new Response('Blocked: private address', { status: 403, headers: CORS })
     }
@@ -115,19 +143,22 @@ serve(async (req: Request) => {
     const ct = (res.headers.get('content-type') || '').toLowerCase()
     const finalUrl = res.url || target
 
-    const outHeaders: Record<string, string> = { ...CORS }
+    // Build clean response headers — use Headers object to avoid case-duplicate keys
+    const outHeaders = new Headers()
+    for (const [k, v] of Object.entries(CORS)) outHeaders.set(k, v)
     for (const [k, v] of res.headers.entries()) {
-      if (!STRIP_HEADERS.has(k.toLowerCase())) outHeaders[k] = v
+      if (!STRIP_HEADERS.has(k.toLowerCase())) outHeaders.set(k, v)
     }
-    outHeaders['content-type'] = ct || 'application/octet-stream'
 
     if (ct.includes('text/html')) {
-      return new Response(rewriteHtml(await res.text(), finalUrl), { headers: outHeaders })
+      outHeaders.set('content-type', 'text/html; charset=utf-8')
+      return new Response(rewriteHtml(await res.text(), finalUrl, proxyBase), { headers: outHeaders })
     }
     if (ct.includes('text/css')) {
-      return new Response(rewriteCss(await res.text(), finalUrl), { headers: outHeaders })
+      outHeaders.set('content-type', ct)
+      return new Response(rewriteCss(await res.text(), finalUrl, proxyBase), { headers: outHeaders })
     }
-    // Pass through binary and other content (images, fonts, JS, etc.)
+    outHeaders.set('content-type', ct || 'application/octet-stream')
     return new Response(res.body, { status: res.status, headers: outHeaders })
 
   } catch (e) {
