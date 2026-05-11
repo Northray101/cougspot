@@ -532,7 +532,6 @@ let navHistory = [];
 let hIdx = -1;
 let currentUrl = '';
 let loading = false;
-let currentAbort = null;
 
 // ── Auth check ──
 (async () => {
@@ -593,11 +592,10 @@ function setLoading(v) {
 
 // ── Screen helpers ──
 function showHome() {
-  if (currentAbort) { currentAbort.abort(); currentAbort = null; }
   homeEl.style.display  = 'flex';
   frame.style.display   = 'none';
   errorEl.classList.remove('visible');
-  frame.srcdoc = '';
+  frame.src = 'about:blank';
   currentUrl = '';
   urlInput.value = '';
   updateSsl('');
@@ -634,10 +632,7 @@ function navigate(url) {
   loadUrl(normalized);
 }
 
-async function loadUrl(url) {
-  if (currentAbort) { currentAbort.abort(); }
-  currentAbort = new AbortController();
-
+function loadUrl(url) {
   currentUrl = url;
   urlInput.value = url;
   urlClear.style.display = 'block';
@@ -645,27 +640,7 @@ async function loadUrl(url) {
   setLoading(true);
   showFrame();
   updateNavButtons();
-
-  try {
-    const resp = await fetch(
-      PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url),
-      { headers: { 'apikey': SUPABASE_ANON }, signal: currentAbort.signal }
-    );
-    currentAbort = null;
-
-    if (!resp.ok) {
-      const text = await resp.text().catch(() => '');
-      showError('HTTP ' + resp.status + (text ? ' — ' + text.slice(0, 120) : ''));
-      return;
-    }
-
-    const html = await resp.text();
-    frame.srcdoc = html;
-  } catch (e) {
-    if (e.name === 'AbortError') return;
-    showError('Could not load: ' + (e.message || String(e)));
-    setLoading(false);
-  }
+  frame.src = PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url);
 }
 
 // ── Button listeners ──
@@ -679,8 +654,7 @@ btnFwd.addEventListener('click', () => {
 
 btnRefresh.addEventListener('click', () => {
   if (loading) {
-    if (currentAbort) { currentAbort.abort(); currentAbort = null; }
-    frame.srcdoc = '';
+    frame.src = 'about:blank';
     setLoading(false);
   } else if (currentUrl) {
     loadUrl(currentUrl);
