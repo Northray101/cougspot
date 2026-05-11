@@ -533,6 +533,7 @@ let navHistory = [];
 let hIdx = -1;
 let currentUrl = '';
 let loading = false;
+let loadAbort = null;
 
 // ── Auth check ──
 (async () => {
@@ -596,7 +597,9 @@ function showHome() {
   homeEl.style.display  = 'flex';
   frame.style.display   = 'none';
   errorEl.classList.remove('visible');
-  frame.src = 'about:blank';
+  if (loadAbort) { loadAbort.abort(); loadAbort = null; }
+  frame.srcdoc = '';
+  frame.removeAttribute('src');
   currentUrl = '';
   urlInput.value = '';
   updateSsl('');
@@ -633,7 +636,8 @@ function navigate(url) {
   loadUrl(normalized);
 }
 
-function loadUrl(url) {
+async function loadUrl(url) {
+  if (loadAbort) { loadAbort.abort(); loadAbort = null; }
   currentUrl = url;
   urlInput.value = url;
   urlClear.style.display = 'block';
@@ -641,7 +645,25 @@ function loadUrl(url) {
   setLoading(true);
   showFrame();
   updateNavButtons();
-  frame.src = PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url);
+
+  const ctrl = new AbortController();
+  loadAbort = ctrl;
+  try {
+    const res = await fetch(
+      PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url),
+      { signal: ctrl.signal }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const html = await res.text();
+    if (ctrl.signal.aborted) return;
+    frame.removeAttribute('src');
+    frame.srcdoc = html;
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    showError('The page failed to load. Check the URL and try again.');
+  } finally {
+    if (loadAbort === ctrl) loadAbort = null;
+  }
 }
 
 // ── Button listeners ──
@@ -655,7 +677,7 @@ btnFwd.addEventListener('click', () => {
 
 btnRefresh.addEventListener('click', () => {
   if (loading) {
-    frame.src = 'about:blank';
+    if (loadAbort) { loadAbort.abort(); loadAbort = null; }
     setLoading(false);
   } else if (currentUrl) {
     loadUrl(currentUrl);
