@@ -7,18 +7,14 @@ const CORS = {
 
 const PROXY_ORIGIN = 'https://dqcyecscdelfikbimnpw.supabase.co/functions/v1/web-proxy'
 
-// Headers we never forward from the proxied site to the browser
-const STRIP_HEADERS = new Set([
-  'content-security-policy',
-  'content-security-policy-report-only',
-  'x-frame-options',
-  'x-xss-protection',
-  'strict-transport-security',
-  'content-encoding',  // Deno decompresses automatically; forwarding this confuses browsers
-  'transfer-encoding',
-  'content-length',    // body changes size after rewriting
-  'content-type',      // we set this ourselves
-])
+function baseResponseHeaders(contentType: string): Record<string, string> {
+  return {
+    ...CORS,
+    'content-type': contentType,
+    'x-content-type-options': 'nosniff',
+    'cache-control': 'no-store',
+  }
+}
 
 function resolveUrl(rel: string, base: string): string {
   if (!rel) return ''
@@ -143,23 +139,41 @@ serve(async (req: Request) => {
     const ct = (res.headers.get('content-type') || '').toLowerCase()
     const finalUrl = res.url || target
 
-    // Build clean response headers — use Headers object to avoid case-duplicate keys
-    const outHeaders = new Headers()
-    for (const [k, v] of Object.entries(CORS)) outHeaders.set(k, v)
-    for (const [k, v] of res.headers.entries()) {
-      if (!STRIP_HEADERS.has(k.toLowerCase())) outHeaders.set(k, v)
+    const isHtml = ct.includes('text/html') || ct.includes('application/xhtml')
+    const isCss = ct.includes('text/css')
+
+    if (isHtml) {
+      const body = await res.text()
+      return new Response(rewriteHtml(body, finalUrl, proxyBase), {
+        status: 200,
+        headers: baseResponseHeaders('text/html; charset=utf-8'),
+      })
+    }
+    if (isCss) {
+      const body = await res.text()
+      return new Response(rewriteCss(body, finalUrl, proxyBase), {
+        status: 200,
+        headers: baseResponseHeaders('text/css; charset=utf-8'),
+      })
     }
 
-    if (ct.includes('text/html')) {
-      outHeaders.set('content-type', 'text/html; charset=utf-8')
-      return new Response(rewriteHtml(await res.text(), finalUrl, proxyBase), { headers: outHeaders })
+    // For everything else (images, fonts, JS, etc.) sniff the body if content-type is missing/text-y
+    const buf = new Uint8Array(await res.arrayBuffer())
+    let outType = ct || 'application/octet-stream'
+    if (!ct || ct.startsWith('text/plain')) {
+      const head = new TextDecoder('utf-8', { fatal: false }).decode(buf.slice(0, 512)).trim().toLowerCase()
+      if (head.startsWith('<!doctype html') || head.startsWith('<html') || head.startsWith('<!doctype>')) {
+        const html = new TextDecoder('utf-8', { fatal: false }).decode(buf)
+        return new Response(rewriteHtml(html, finalUrl, proxyBase), {
+          status: 200,
+          headers: baseResponseHeaders('text/html; charset=utf-8'),
+        })
+      }
     }
-    if (ct.includes('text/css')) {
-      outHeaders.set('content-type', ct)
-      return new Response(rewriteCss(await res.text(), finalUrl, proxyBase), { headers: outHeaders })
-    }
-    outHeaders.set('content-type', ct || 'application/octet-stream')
-    return new Response(res.body, { status: res.status, headers: outHeaders })
+    return new Response(buf, {
+      status: res.status,
+      headers: baseResponseHeaders(outType),
+    })
 
   } catch (e) {
     return new Response(`Proxy error: ${e}`, {
