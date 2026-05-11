@@ -494,7 +494,7 @@ html, body { height: 100vh; overflow: hidden; }
     <!-- The proxied browser iframe -->
     <iframe
       id="browser-frame"
-      sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-downloads"
+      sandbox="allow-scripts allow-forms allow-popups allow-downloads"
       allow="fullscreen"
     ></iframe>
 
@@ -640,7 +640,7 @@ function loadUrl(url) {
   setLoading(true);
   showFrame();
   updateNavButtons();
-  frame.src = PROXY + '?url=' + encodeURIComponent(url);
+  frame.src = PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url);
 }
 
 // ── Button listeners ──
@@ -686,11 +686,7 @@ document.getElementById('home-go').addEventListener('click', () => navigate(home
 
 // ── Iframe events ──
 frame.addEventListener('load', () => {
-  if (frame.src && frame.src !== 'about:blank') setLoading(false);
-});
-
-frame.addEventListener('error', () => {
-  showError('The page could not be reached. The site may be down or blocking proxy access.');
+  setLoading(false);
 });
 
 // ── Messages from proxied pages ──
@@ -704,6 +700,9 @@ window.addEventListener('message', e => {
   }
   if (e.data.type === 'proxy-title' && e.data.title) {
     document.title = e.data.title + ' — CougSpot Browser';
+  }
+  if (e.data.type === 'proxy-click' && e.data.url) {
+    navigate(e.data.url);
   }
 });
 
