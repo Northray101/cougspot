@@ -494,8 +494,9 @@ html, body { height: 100vh; overflow: hidden; }
     <!-- The proxied browser iframe -->
     <iframe
       id="browser-frame"
-      sandbox="allow-scripts allow-forms allow-popups allow-downloads"
+      sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-same-origin"
       allow="fullscreen"
+      referrerpolicy="no-referrer"
     ></iframe>
 
   </div><!-- .browser-viewport -->
