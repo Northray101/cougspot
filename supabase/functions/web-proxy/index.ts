@@ -7,13 +7,13 @@ const CORS = {
 
 const PROXY_ORIGIN = 'https://dqcyecscdelfikbimnpw.supabase.co/functions/v1/web-proxy'
 
-function baseResponseHeaders(contentType: string): Record<string, string> {
-  return {
-    ...CORS,
-    'content-type': contentType,
-    'x-content-type-options': 'nosniff',
-    'cache-control': 'no-store',
-  }
+function baseResponseHeaders(contentType: string): Headers {
+  const h = new Headers()
+  h.set('Access-Control-Allow-Origin', '*')
+  h.set('Access-Control-Allow-Headers', 'authorization, x-client-info, apikey, content-type')
+  h.set('Content-Type', contentType)
+  h.set('Cache-Control', 'no-store')
+  return h
 }
 
 function resolveUrl(rel: string, base: string): string {
@@ -144,14 +144,16 @@ serve(async (req: Request) => {
 
     if (isHtml) {
       const body = await res.text()
-      return new Response(rewriteHtml(body, finalUrl, proxyBase), {
+      const out = new TextEncoder().encode(rewriteHtml(body, finalUrl, proxyBase))
+      return new Response(out, {
         status: 200,
         headers: baseResponseHeaders('text/html; charset=utf-8'),
       })
     }
     if (isCss) {
       const body = await res.text()
-      return new Response(rewriteCss(body, finalUrl, proxyBase), {
+      const out = new TextEncoder().encode(rewriteCss(body, finalUrl, proxyBase))
+      return new Response(out, {
         status: 200,
         headers: baseResponseHeaders('text/css; charset=utf-8'),
       })
@@ -164,7 +166,8 @@ serve(async (req: Request) => {
       const head = new TextDecoder('utf-8', { fatal: false }).decode(buf.slice(0, 512)).trim().toLowerCase()
       if (head.startsWith('<!doctype html') || head.startsWith('<html') || head.startsWith('<!doctype>')) {
         const html = new TextDecoder('utf-8', { fatal: false }).decode(buf)
-        return new Response(rewriteHtml(html, finalUrl, proxyBase), {
+        const out = new TextEncoder().encode(rewriteHtml(html, finalUrl, proxyBase))
+        return new Response(out, {
           status: 200,
           headers: baseResponseHeaders('text/html; charset=utf-8'),
         })
