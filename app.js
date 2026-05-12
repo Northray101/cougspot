@@ -311,9 +311,8 @@ function initHomeGreeting(username) {
 /* ════════════════════════════════════════════
    CLOAK AI CHATBOT
 ════════════════════════════════════════════ */
-const CLOAK_API    = 'https://api.usecloak.org/v1/chat';
-const CLOAK_MODEL  = 'pneuma';
-const CLOAK_SYSTEM = 'You are a helpful assistant for Norco High School students. Be concise, friendly, and helpful with school-related topics, homework, and general questions.';
+const CLOAK_API   = 'https://api.usecloak.org/v1/chat';
+const CLOAK_MODEL = 'pneuma';
 
 let chatHistory = []; // { role: 'user'|'assistant', message: '...' }
 let chatTyping  = false;
@@ -354,7 +353,6 @@ async function sendChatMessage() {
 
   try {
     const messages = [
-      { role: 'system', content: CLOAK_SYSTEM },
       ...chatHistory.slice(0, -1).map(m => ({
         role: m.role === 'user' ? 'user' : 'assistant',
         content: m.message,
