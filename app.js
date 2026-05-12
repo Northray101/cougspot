@@ -314,8 +314,16 @@ function initHomeGreeting(username) {
 const CLOAK_API   = 'https://api.usecloak.org/v1/chat';
 const CLOAK_MODEL = 'pneuma';
 
-let chatHistory = []; // { role: 'user'|'assistant', message: '...' }
-let chatTyping  = false;
+let chatHistory   = [];
+let _cpBusy       = false;
+let _cpStreamAbort = false;
+
+function cpAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  const btn = document.getElementById('cp-send-btn');
+  if (btn) btn.disabled = !el.value.trim();
+}
 
 function chatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
@@ -332,24 +340,110 @@ function toggleCloak() {
   }
 }
 
+function cpScrollBottom() {
+  const area = document.getElementById('cp-chat-area');
+  if (area) area.scrollTop = area.scrollHeight;
+}
+
+function cpShowMessages() {
+  const empty = document.getElementById('cp-empty');
+  const msgs  = document.getElementById('chat-messages');
+  if (empty) empty.style.display = 'none';
+  if (msgs)  msgs.style.display  = 'flex';
+}
+
+function cpAddUserMsg(text) {
+  cpShowMessages();
+  const msgs = document.getElementById('chat-messages');
+  if (!msgs) return;
+  const d = document.createElement('div');
+  d.className = 'cp-msg user';
+  d.innerHTML = `<div class="cp-bubble">${escHtml(text)}</div>`;
+  msgs.appendChild(d);
+  cpScrollBottom();
+}
+
+function cpInsertBotBubble() {
+  cpShowMessages();
+  const msgs = document.getElementById('chat-messages');
+  if (!msgs) return null;
+  const d = document.createElement('div');
+  d.className = 'cp-msg bot';
+  d.innerHTML = `<div class="cp-bot-body">
+    <div class="cp-bot-meta"><div class="cp-bot-dot"></div><span class="cp-bot-label">Cloak</span></div>
+    <div class="cp-bot-content"><div class="cp-typing"><div class="cp-dot"></div><div class="cp-dot"></div><div class="cp-dot"></div></div></div>
+  </div>`;
+  msgs.appendChild(d);
+  cpScrollBottom();
+  return d;
+}
+
+function cpStreamContent(container, rawText, onComplete) {
+  _cpStreamAbort = false;
+  let pos = 0;
+  const total = rawText.length;
+
+  function renderPartial(text) {
+    if (!text) { container.innerHTML = '<span class="cp-sc"></span>'; return; }
+    const lastBlock = text.lastIndexOf('\n\n');
+    let html;
+    if (lastBlock === -1) {
+      html = '<p>' + escHtml(text) + '<span class="cp-sc"></span></p>';
+    } else {
+      const complete = text.slice(0, lastBlock + 2);
+      const trailing = text.slice(lastBlock + 2);
+      html = marked.parse(complete);
+      if (trailing) html += '<p>' + escHtml(trailing) + '<span class="cp-sc"></span></p>';
+      else html += '<span class="cp-sc"></span>';
+    }
+    container.innerHTML = html;
+    cpScrollBottom();
+  }
+
+  function tick() {
+    if (_cpStreamAbort || pos >= total) {
+      container.innerHTML = marked.parse(rawText);
+      cpScrollBottom();
+      if (onComplete) onComplete();
+      return;
+    }
+    const prevChar = pos > 0 ? rawText[pos - 1] : '';
+    let chunk, delay;
+    if ('.!?'.includes(prevChar) && rawText[pos] === ' ') {
+      chunk = 1; delay = 55 + Math.random() * 75;
+    } else if (',;'.includes(prevChar)) {
+      chunk = 1; delay = 12 + Math.random() * 18;
+    } else if (prevChar === '\n') {
+      chunk = 1; delay = 25 + Math.random() * 40;
+    } else {
+      const r = Math.random();
+      if (r < 0.08)      { chunk = 1; delay = 40 + Math.random() * 30; }
+      else if (r < 0.25) { chunk = 1; delay = 12 + Math.random() * 10; }
+      else if (r < 0.65) { chunk = Math.floor(2 + Math.random() * 3); delay = 8 + Math.random() * 6; }
+      else               { chunk = Math.floor(4 + Math.random() * 6); delay = 4 + Math.random() * 4; }
+    }
+    pos = Math.min(pos + chunk, total);
+    renderPartial(rawText.slice(0, pos));
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
 async function sendChatMessage() {
-  const input   = document.getElementById('chat-input');
+  const input = document.getElementById('chat-input');
   const content = input?.value.trim();
-  if (!content || chatTyping) return;
+  if (!content || _cpBusy) return;
+  _cpBusy = true;
+
   input.value = '';
+  input.style.height = 'auto';
+  const btn = document.getElementById('cp-send-btn');
+  if (btn) btn.disabled = true;
 
   chatHistory.push({ role: 'user', message: content });
-  renderChatMessages();
+  cpAddUserMsg(content);
 
-  chatTyping = true;
-  const messagesEl = document.getElementById('chat-messages');
-  if (messagesEl) {
-    const typingEl = document.createElement('div');
-    typingEl.className = 'chat-bubble bot typing';
-    typingEl.textContent = '…';
-    messagesEl.appendChild(typingEl);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
+  const botMsgEl = cpInsertBotBubble();
 
   try {
     const messages = [
@@ -366,24 +460,34 @@ async function sendChatMessage() {
     });
     const json = await res.json();
     if (json.error) throw new Error(typeof json.error === 'string' ? json.error : JSON.stringify(json.error));
-    const reply = json.response || 'No response received.';
+    const reply = json.response || json.text || 'No response received.';
     chatHistory.push({ role: 'assistant', message: reply });
+
+    if (botMsgEl) {
+      const bc = botMsgEl.querySelector('.cp-bot-content');
+      if (bc) {
+        const typing = bc.querySelector('.cp-typing');
+        const start = () => {
+          bc.innerHTML = '';
+          cpStreamContent(bc, reply, () => { _cpBusy = false; });
+        };
+        if (typing) {
+          typing.classList.add('fade-out');
+          setTimeout(start, 160);
+        } else {
+          start();
+        }
+      }
+    }
   } catch (e) {
-    chatHistory.push({ role: 'assistant', message: 'Could not reach Cloak AI. Check your connection or try again later.' });
+    const reply = 'Could not reach Cloak. Check your connection or try again.';
+    chatHistory.push({ role: 'assistant', message: reply });
+    if (botMsgEl) {
+      const bc = botMsgEl.querySelector('.cp-bot-content');
+      if (bc) bc.innerHTML = `<p style="color:var(--cp-acc)">${escHtml(reply)}</p>`;
+    }
+    _cpBusy = false;
   }
-
-  chatTyping = false;
-  renderChatMessages();
-}
-
-function renderChatMessages() {
-  const el = document.getElementById('chat-messages');
-  if (!el) return;
-  el.innerHTML = chatHistory.map((m, i) => {
-    const cls = m.role === 'user' ? 'user' : 'bot';
-    return `<div class="chat-bubble ${cls}" style="animation-delay:${i * 20}ms">${escHtml(m.message)}</div>`;
-  }).join('');
-  el.scrollTop = el.scrollHeight;
 }
 
 /* ════════════════════════════════════════════

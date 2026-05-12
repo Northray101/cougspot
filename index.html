@@ -485,19 +485,42 @@
 
 <!-- CLOAK SIDE PANEL -->
 <div class="cloak-panel" id="cloak-panel">
-  <div class="cloak-panel-header">
-    <div style="display:flex;align-items:center;gap:9px">
-      <span class="cloak-pulse-dot"></span>
-      <span class="cloak-panel-title">Cloak AI</span>
+  <div class="cp-topbar">
+    <div class="cp-topbar-left">
+      <div class="cp-live-dot"></div>
+      <span class="cp-brand">Cloak</span>
     </div>
-    <button class="cloak-panel-close" onclick="toggleCloak()" title="Close">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+    <div class="cp-topbar-right">
+      <button class="cp-icon-btn" onclick="toggleCloak()" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
-  <div class="chat-messages" id="chat-messages"></div>
-  <div class="chat-input-row">
-    <textarea class="chat-input" id="chat-input" rows="2" placeholder="Ask anything…" onkeydown="chatKey(event)"></textarea>
-    <button class="btn btn-primary" style="align-self:flex-end;padding:8px 14px;font-size:13px" onclick="sendChatMessage()">Send</button>
+
+  <div class="cp-chat-area" id="cp-chat-area">
+    <div class="cp-empty" id="cp-empty">
+      <div class="cp-empty-inner">
+        <div class="cp-greeting">Hey there!</div>
+        <div class="cp-slogan">A human resource, not a companion.</div>
+      </div>
+    </div>
+    <div class="cp-messages" id="chat-messages" style="display:none"></div>
+  </div>
+
+  <div class="cp-input-area">
+    <div class="cp-input-wrap">
+      <div class="cp-input-box" id="cp-input-box">
+        <textarea class="cp-chat-input" id="chat-input" placeholder="Message Cloak…" rows="1"
+          oninput="cpAutoResize(this)" onkeydown="chatKey(event)"></textarea>
+        <button class="cp-send-btn" id="cp-send-btn" onclick="sendChatMessage()" disabled title="Send">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z"/></svg>
+        </button>
+      </div>
+      <div class="cp-input-foot">
+        <span class="cp-input-sub">Cloak can make mistakes.</span>
+        <span class="cp-input-sub">Enter to send · Shift+Enter for new line</span>
+      </div>
+    </div>
   </div>
 </div>
 <div class="cloak-panel-overlay" id="cloak-overlay" onclick="toggleCloak()"></div>
