@@ -79,10 +79,6 @@ body { min-height: 100vh; overflow-x: hidden; background: var(--bg); color: var(
 #app {
   position: relative;
   z-index: 1;
-  transition: margin-right 320ms cubic-bezier(0.32,0.72,0,1);
-}
-body.cloak-open #app {
-  margin-right: 380px;
 }
 
 /* ── Screens ── */
@@ -1320,10 +1316,14 @@ body.cloak-open .nav-cloak-btn {
 .cloak-panel-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 199;
   background: rgba(0,0,0,0.25);
 }
+body.cloak-open .cloak-panel-overlay { display: block; }
 
 .cloak-panel-header {
   display: flex;
@@ -1452,9 +1452,6 @@ body.cloak-open .nav-cloak-btn {
   .home-sidebar {
     width: 100%;
     position: static;
-  }
-  body.cloak-open #app {
-    margin-right: 0;
   }
   .cloak-panel {
     width: 100%;
