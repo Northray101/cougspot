@@ -633,7 +633,9 @@ function navigate(url) {
   loadUrl(normalized);
 }
 
-function loadUrl(url) {
+let _currentBlobUrl = null;
+
+async function loadUrl(url) {
   currentUrl = url;
   urlInput.value = url;
   urlClear.style.display = 'block';
@@ -641,7 +643,18 @@ function loadUrl(url) {
   setLoading(true);
   showFrame();
   updateNavButtons();
-  frame.src = PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url);
+
+  try {
+    const proxyUrl = PROXY + '?apikey=' + SUPABASE_ANON + '&url=' + encodeURIComponent(url);
+    const res = await fetch(proxyUrl);
+    const html = await res.text();
+    if (_currentBlobUrl) URL.revokeObjectURL(_currentBlobUrl);
+    const blob = new Blob([html], { type: 'text/html' });
+    _currentBlobUrl = URL.createObjectURL(blob);
+    frame.src = _currentBlobUrl;
+  } catch (e) {
+    showError('Failed to load page: ' + (e.message || e));
+  }
 }
 
 // ── Button listeners ──
