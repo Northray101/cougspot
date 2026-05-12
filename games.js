@@ -11,7 +11,7 @@ let currentFilter = 'all';
 let playCounts = {};
 
 const ROM = (file, system) =>
-  `games/emulator.html?system=${system}&rom=${encodeURIComponent('games/roms/' + file)}`;
+  `games/emulator.html?system=${system}&rom=${encodeURIComponent('roms/' + file)}`;
 
 const GAMES = [
   // ── HTML5 Classics ──────────────────────────────────────────────────────
