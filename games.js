@@ -37,13 +37,13 @@ const GAMES = [
     thumb: 'games/thumbs/tetris-nes.svg', icon: '🟦', desc: 'The legendary NES version with Russian soundtrack.' },
   // ── Retro — SNES ─────────────────────────────────────────────────────────
   { id: 'mario-world', name: 'Super Mario World',       category: 'retro', addedAt: '2026-05-08',
-    src: ROM('Super Mario World (USA).sfc', 'snes'),
+    src: ROM('Super Mario World (USA).sfc', 'snes9x'),
     thumb: 'games/thumbs/mario-world.svg', icon: '🦕', desc: 'Explore Dinosaur Land with Mario and Yoshi.' },
   { id: 'zelda-lttp',  name: 'Zelda: A Link to the Past', category: 'retro', addedAt: '2026-05-08',
-    src: ROM('Legend of Zelda, The - A Link to the Past (USA).sfc', 'snes'),
+    src: ROM('Legend of Zelda, The - A Link to the Past (USA).sfc', 'snes9x'),
     thumb: 'games/thumbs/zelda-lttp.svg', icon: '🗡️', desc: 'Link battles Ganon across Hyrule and the Dark World.' },
   { id: 'megaman-x',   name: 'Mega Man X',               category: 'retro', addedAt: '2026-05-08',
-    src: ROM('Mega Man X (USA) (Rev 1).sfc', 'snes'),
+    src: ROM('Mega Man X (USA) (Rev 1).sfc', 'snes9x'),
     thumb: 'games/thumbs/megaman-x.svg',  icon: '🤖', desc: 'Run, jump, and blast as X in a cyber future.' },
 ];
 

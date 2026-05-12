@@ -14,11 +14,12 @@
 <div id="emulator"></div>
 <script>
   const p = new URLSearchParams(location.search);
-  EJS_player  = '#emulator';
-  EJS_core    = p.get('system') || 'nes';
-  EJS_gameUrl = p.get('rom')   || '';
-  EJS_color   = '#C15F3C';
+  EJS_player        = '#emulator';
+  EJS_core          = p.get('system') || 'nes';
+  EJS_gameUrl       = p.get('rom')   || '';
+  EJS_color         = '#C15F3C';
   EJS_startOnLoaded = true;
+  EJS_Buttons       = { playPause: true, restart: true, mute: true, settings: true, fullscreen: true, saveState: true, loadState: true };
 </script>
 <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
 </body>
